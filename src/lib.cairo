@@ -2,6 +2,8 @@ mod blocks;
 mod decoding;
 mod fse;
 mod huff0;
+
+#[cfg(test)]
 mod tests;
 
 // This is a nice example, so why removing it until we have our own main? 
@@ -20,16 +22,5 @@ fn fib(mut n: felt252) -> felt252 {
         let temp = b;
         b = a + b;
         a = temp;
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::fib;
-
-    #[test]
-    #[available_gas(100000)]
-    fn it_works() {
-        assert(fib(16) == 987, 'it works!');
     }
 }
