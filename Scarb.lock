@@ -2,5 +2,32 @@
 version = 1
 
 [[package]]
+name = "alexandria_data_structures"
+version = "0.1.0"
+source = "git+https://github.com/sveamarcus/alexandria.git#49c30223eb69efd481ac1e479f45e729e5c31bae"
+dependencies = [
+ "alexandria_encoding",
+]
+
+[[package]]
+name = "alexandria_encoding"
+version = "0.1.0"
+source = "git+https://github.com/sveamarcus/alexandria.git#49c30223eb69efd481ac1e479f45e729e5c31bae"
+dependencies = [
+ "alexandria_math",
+]
+
+[[package]]
+name = "alexandria_math"
+version = "0.2.0"
+source = "git+https://github.com/sveamarcus/alexandria.git#49c30223eb69efd481ac1e479f45e729e5c31bae"
+dependencies = [
+ "alexandria_data_structures",
+]
+
+[[package]]
 name = "cairo_zstd"
 version = "0.1.0"
+dependencies = [
+ "alexandria_math",
+]
