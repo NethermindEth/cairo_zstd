@@ -6,3 +6,4 @@ version = "0.1.0"
 
 [dependencies]
 alexandria_math = { git = "https://github.com/sveamarcus/alexandria.git" }
+core = {git = "https://github.com/starkware-libs/cairo.git"}
