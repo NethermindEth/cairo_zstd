@@ -1,3 +1,10 @@
+mod blocks;
+mod decoding;
+mod fse;
+mod huff0;
+mod tests;
+
+// This is a nice example, so why removing it until we have our own main? 
 fn main() -> felt252 {
     fib(16)
 }
