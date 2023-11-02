@@ -125,3 +125,51 @@ fn i32_div(mut lhs: i32, mut rhs: i32) -> i32 {
 
     result
 }
+
+trait Bits<T> {
+    #[inline(always)]
+    fn BITS() -> usize;
+}
+
+impl U8Bits of Bits<u8> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        8
+    }
+}
+
+impl U16Bits of Bits<u16> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        16
+    }
+}
+
+impl U32Bits of Bits<u32> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        32
+    }
+}
+
+impl U64Bits of Bits<u64> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        64
+    }
+}
+
+impl U128Bits of Bits<u128> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        128
+    }
+}
+
+impl U256Bits of Bits<u256> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        256
+    }
+}
+
