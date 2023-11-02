@@ -173,3 +173,54 @@ impl U256Bits of Bits<u256> {
     }
 }
 
+trait LeadingZeros<T> {
+    fn leading_zeros(self: T) -> usize;
+}
+
+impl LeadingZerosImpl<
+    T,
+    +Bits<T>,
+    +BoundedInt<T>,
+    +Into<u8, T>,
+    +Div<T>,
+    +Add<T>,
+    +BitAnd<T>,
+    +PartialEq<T>,
+    +DivEq<T>,
+    +Copy<T>,
+    +Drop<T>
+> of LeadingZeros<T> {
+    fn leading_zeros(self: T) -> usize {
+        if self == 0_u8.into() {
+            return Bits::<T>::BITS();
+        }
+
+        // keeping it simple for now, just reverse looping through the bits until a set bit is
+        // found
+
+        let mut count: usize = 0;
+        let max = BoundedInt::max();
+        let mut mask: T = max / 2_u8.into() + 1_u8.into();
+
+        loop {
+            if self & mask != 0_u8.into() {
+                break count;
+            }
+
+            count += 1;
+            mask /= 2_u8.into();
+        }
+    }
+}
+
+trait HighestBitSet<T> {
+    fn highest_bit_set(self: NonZero<T>) -> usize;
+}
+
+impl HighestBitSetImpl<T, +LeadingZeros<T>, +Bits<T>, +Copy<T>, +Drop<T>> of HighestBitSet<T> {
+    fn highest_bit_set(self: NonZero<T>) -> usize {
+        let value: T = self.into();
+
+        Bits::<T>::BITS() - value.leading_zeros()
+    }
+}
