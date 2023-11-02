@@ -2,6 +2,7 @@ mod blocks;
 mod decoding;
 mod fse;
 mod huff0;
+mod utils;
 
 #[cfg(test)]
 mod tests;
