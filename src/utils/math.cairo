@@ -64,6 +64,20 @@ impl U64TryIntoI64 of TryInto<u64, i64> {
     }
 }
 
+impl U64TryIntoI32 of TryInto<u64, i32> {
+    fn try_into(self: u64) -> Option<i32> {
+        let u32_max: u32 = BoundedInt::max();
+
+        if self > u32_max.into() / 2 - 1 {
+            return Option::None;
+        }
+
+        let val_felt: felt252 = self.into();
+
+        Option::Some(val_felt.try_into()?)
+    }
+}
+
 impl I64TryIntoI32 of TryInto<i64, i32> {
     fn try_into(self: i64) -> Option<i32> {
         let val_felt: felt252 = self.into();
