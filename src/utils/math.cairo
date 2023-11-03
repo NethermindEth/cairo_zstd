@@ -64,6 +64,20 @@ impl U64TryIntoI64 of TryInto<u64, i64> {
     }
 }
 
+impl U64TryIntoI32 of TryInto<u64, i32> {
+    fn try_into(self: u64) -> Option<i32> {
+        let u32_max: u32 = BoundedInt::max();
+
+        if self > u32_max.into() / 2 - 1 {
+            return Option::None;
+        }
+
+        let val_felt: felt252 = self.into();
+
+        Option::Some(val_felt.try_into()?)
+    }
+}
+
 impl I64TryIntoI32 of TryInto<i64, i32> {
     fn try_into(self: i64) -> Option<i32> {
         let val_felt: felt252 = self.into();
@@ -124,4 +138,133 @@ fn i32_div(mut lhs: i32, mut rhs: i32) -> i32 {
     }
 
     result
+}
+
+impl I8Felt252DictValue of Felt252DictValue<i8> {
+    fn zero_default() -> i8 nopanic {
+        0
+    }
+}
+
+impl I16Felt252DictValue of Felt252DictValue<i16> {
+    fn zero_default() -> i16 nopanic {
+        0
+    }
+}
+
+impl I32Felt252DictValue of Felt252DictValue<i32> {
+    fn zero_default() -> i32 nopanic {
+        0
+    }
+}
+
+impl I64Felt252DictValue of Felt252DictValue<i64> {
+    fn zero_default() -> i64 nopanic {
+        0
+    }
+}
+
+impl I128Felt252DictValue of Felt252DictValue<i128> {
+    fn zero_default() -> i128 nopanic {
+        0
+    }
+}
+
+trait Bits<T> {
+    #[inline(always)]
+    fn BITS() -> usize;
+}
+
+impl U8Bits of Bits<u8> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        8
+    }
+}
+
+impl U16Bits of Bits<u16> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        16
+    }
+}
+
+impl U32Bits of Bits<u32> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        32
+    }
+}
+
+impl U64Bits of Bits<u64> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        64
+    }
+}
+
+impl U128Bits of Bits<u128> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        128
+    }
+}
+
+impl U256Bits of Bits<u256> {
+    #[inline(always)]
+    fn BITS() -> usize {
+        256
+    }
+}
+
+trait LeadingZeros<T> {
+    fn leading_zeros(self: T) -> usize;
+}
+
+impl LeadingZerosImpl<
+    T,
+    +Bits<T>,
+    +BoundedInt<T>,
+    +Into<u8, T>,
+    +Div<T>,
+    +Add<T>,
+    +BitAnd<T>,
+    +PartialEq<T>,
+    +DivEq<T>,
+    +Copy<T>,
+    +Drop<T>
+> of LeadingZeros<T> {
+    fn leading_zeros(self: T) -> usize {
+        if self == 0_u8.into() {
+            return Bits::<T>::BITS();
+        }
+
+        // keeping it simple for now, just reverse looping through the bits until a set bit is
+        // found
+
+        let mut count: usize = 0;
+        let max = BoundedInt::max();
+        let mut mask: T = max / 2_u8.into() + 1_u8.into();
+
+        loop {
+            if self & mask != 0_u8.into() {
+                break count;
+            }
+
+            count += 1;
+            mask /= 2_u8.into();
+        }
+    }
+}
+
+trait HighestBitSet<T> {
+    fn highest_bit_set(self: NonZero<T>) -> usize;
+}
+
+impl HighestBitSetImpl<T, +LeadingZeros<T>, +Bits<T>, +Copy<T>, +Drop<T>> of HighestBitSet<T> {
+    fn highest_bit_set(self: NonZero<T>) -> usize {
+        let value: T = self.into();
+
+        Bits::<T>::BITS() - value.leading_zeros()
+    }
 }
