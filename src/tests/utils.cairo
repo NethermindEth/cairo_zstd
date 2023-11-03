@@ -62,7 +62,6 @@ fn _test_highest_bit_set<
     +Bits<T>,
     +Into<u8, T>,
     +TryInto<T, NonZero<T>>,
-    +AddEq<T>,
     +MulEq<T>,
     +Copy<T>,
     +Drop<T>
