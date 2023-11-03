@@ -64,6 +64,20 @@ impl U64TryIntoI64 of TryInto<u64, i64> {
     }
 }
 
+impl U64TryIntoI32 of TryInto<u64, i32> {
+    fn try_into(self: u64) -> Option<i32> {
+        let u32_max: u32 = BoundedInt::max();
+
+        if self > u32_max.into() / 2 - 1 {
+            return Option::None;
+        }
+
+        let val_felt: felt252 = self.into();
+
+        Option::Some(val_felt.try_into()?)
+    }
+}
+
 impl I64TryIntoI32 of TryInto<i64, i32> {
     fn try_into(self: i64) -> Option<i32> {
         let val_felt: felt252 = self.into();
@@ -124,6 +138,36 @@ fn i32_div(mut lhs: i32, mut rhs: i32) -> i32 {
     }
 
     result
+}
+
+impl I8Felt252DictValue of Felt252DictValue<i8> {
+    fn zero_default() -> i8 nopanic {
+        0
+    }
+}
+
+impl I16Felt252DictValue of Felt252DictValue<i16> {
+    fn zero_default() -> i16 nopanic {
+        0
+    }
+}
+
+impl I32Felt252DictValue of Felt252DictValue<i32> {
+    fn zero_default() -> i32 nopanic {
+        0
+    }
+}
+
+impl I64Felt252DictValue of Felt252DictValue<i64> {
+    fn zero_default() -> i64 nopanic {
+        0
+    }
+}
+
+impl I128Felt252DictValue of Felt252DictValue<i128> {
+    fn zero_default() -> i128 nopanic {
+        0
+    }
 }
 
 trait Bits<T> {
