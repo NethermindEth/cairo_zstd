@@ -71,3 +71,22 @@ impl Felt252VecReserve<
     }
 }
 
+impl SpanIntoVec<T, V, impl VecTraitImpl: VecTrait<V, T>, +Drop<V>, +Copy<T>> of Into<Span<T>, V> {
+    fn into(self: Span<T>) -> V {
+        let mut i: usize = 0;
+        let len = self.len();
+        let mut vec = VecTrait::<V, T>::new();
+
+        loop {
+            if i == len {
+                break;
+            }
+
+            vec.push(*self.at(i));
+
+            i += 1;
+        };
+
+        vec
+    }
+}
