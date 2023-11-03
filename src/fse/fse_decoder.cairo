@@ -1,7 +1,6 @@
-use byte_array::ByteArray;
-
 use alexandria_math::BitShift;
 use alexandria_data_structures::vec::{VecTrait, Felt252Vec};
+use alexandria_data_structures::byte_array_ext::{ByteArrayTraitExt};
 
 use cairo_zstd::decoding::bit_reader::{BitReaderTrait, GetBitsError};
 use cairo_zstd::decoding::bit_reader_reverse::{BitReaderReversed, BitReaderReversedTrait};
@@ -11,6 +10,7 @@ use cairo_zstd::utils::math::{
 use cairo_zstd::utils::vec::{
     Concat, SpanIntoVec, Clear, Felt252VecClear, Felt252VecResize, Reserve
 };
+use cairo_zstd::utils::byte_array::ByteArraySlice;
 
 impl Felt252DictEntryDrop of Drop<Felt252Dict<Entry>>;
 impl Felt252DictEntryCopy of Copy<Felt252Dict<Entry>>;
@@ -146,7 +146,7 @@ impl FSETableImpl of FSETableTrait {
     }
 
     fn build_decoder(
-        ref self: FSETable, source: @ByteArray, max_log: u8
+        ref self: FSETable, source: ByteArraySlice, max_log: u8
     ) -> Result<usize, FSETableError> {
         self.accuracy_log = 0;
 
@@ -271,11 +271,11 @@ impl FSETableImpl of FSETableTrait {
     }
 
     fn read_probabilities(
-        ref self: FSETable, source: @ByteArray, max_log: u8
+        ref self: FSETable, source: ByteArraySlice, max_log: u8
     ) -> Result<usize, FSETableError> {
         self.symbol_probabilities.clear();
 
-        let mut br = BitReaderTrait::new(source);
+        let mut br = BitReaderTrait::new(@source);
 
         let acc_idx = br.get_bits(4);
         if acc_idx.is_err() {
