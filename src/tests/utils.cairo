@@ -22,14 +22,14 @@ fn test_leading_zeros() {
 }
 
 fn _test_leading_zeros<
-    T, +LeadingZeros<T>, +Bits<T>, +Into<u8, T>, +AddEq<T>, +MulEq<T>, +Copy<T>, +Drop<T>
+    T, +LeadingZeros<T>, +Bits<T>, +Into<u8, T>, +MulEq<T>, +Copy<T>, +Drop<T>
 >() {
     let mut value: T = 0_u8.into();
     let mut expected_leading_zeros = Bits::<T>::BITS();
 
     assert(value.leading_zeros() == expected_leading_zeros, 'Wrong leading zeros count');
 
-    value += 1_u8.into();
+    value = 1_u8.into();
     expected_leading_zeros -= 1;
     assert(value.leading_zeros() == expected_leading_zeros, 'Wrong leading zeros count');
 
