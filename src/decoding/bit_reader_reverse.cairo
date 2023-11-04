@@ -1,28 +1,28 @@
 use cmp::min;
 use integer::BoundedInt;
-use byte_array::ByteArray;
 use bytes_31::{one_shift_left_bytes_u128};
 use debug::PrintTrait;
 
 use alexandria_data_structures::byte_array_ext::{ByteArrayTraitExt};
 use alexandria_math::{BitShift, pow};
 
+use cairo_zstd::decoding::bit_reader::{GetBitsError};
 use cairo_zstd::utils::math::{
     I32TryIntoU32, I32TryIntoU64, U32TryIntoI32, I64TryIntoU64, U64TryIntoI64, I64TryIntoI32,
     I32TryIntoU8, U8TryIntoI32, I32Div,
 };
 use cairo_zstd::utils::types::isize;
-use cairo_zstd::decoding::bit_reader::{GetBitsError};
+use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait, ByteArrayTraitExtRead};
 
 #[derive(Drop)]
 struct BitReaderReversed {
     idx: isize,
-    source: @ByteArray,
+    source: @ByteArraySlice,
     bit_container: u64,
     bits_in_container: u64,
 }
 
-fn word_u48_le(self: @ByteArray, offset: usize) -> Option<u64> {
+fn word_u48_le(self: @ByteArraySlice, offset: usize) -> Option<u64> {
     let b1 = self.at(offset)?;
     let b2 = self.at(offset + 1)?;
     let b3 = self.at(offset + 2)?;
@@ -49,7 +49,7 @@ impl BitReaderReversedImpl of BitReaderReversedTrait {
         (*self.idx) + bits_in_container_i32.into()
     }
 
-    fn new(source: @ByteArray) -> BitReaderReversed {
+    fn new(source: @ByteArraySlice) -> BitReaderReversed {
         BitReaderReversed {
             idx: source.len().try_into().unwrap() * 8,
             source,
@@ -266,7 +266,7 @@ impl BitReaderReversedImpl of BitReaderReversedTrait {
         value_masked
     }
 
-    fn reset(ref self: BitReaderReversed, new_source: @ByteArray) {
+    fn reset(ref self: BitReaderReversed, new_source: @ByteArraySlice) {
         self.idx = new_source.len().try_into().unwrap() * 8;
         self.source = new_source;
         self.bit_container = 0;

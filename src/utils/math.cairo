@@ -268,3 +268,15 @@ impl HighestBitSetImpl<T, +LeadingZeros<T>, +Bits<T>, +Copy<T>, +Drop<T>> of Hig
         Bits::<T>::BITS() - value.leading_zeros()
     }
 }
+
+trait IsPowerOfTwo<T> {
+    fn is_power_of_two(self: T) -> bool;
+}
+
+impl IsPowerOfTwoImpl<
+    T, +Into<u8, T>, +PartialEq<T>, +BitAnd<T>, +Sub<T>, +Copy<T>, +Drop<T>
+> of IsPowerOfTwo<T> {
+    fn is_power_of_two(self: T) -> bool {
+        self != 0_u8.into() && (self & (self - 1_u8.into())) == 0_u8.into()
+    }
+}

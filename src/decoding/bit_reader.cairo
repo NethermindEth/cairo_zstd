@@ -1,11 +1,11 @@
-use byte_array::ByteArray;
-
 use alexandria_math::{BitShift, pow};
+
+use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait, ByteArrayTraitExtRead};
 
 #[derive(Drop)]
 struct BitReader {
     idx: usize,
-    source: @ByteArray,
+    source: @ByteArraySlice,
 }
 
 #[derive(Copy, Drop)]
@@ -16,7 +16,7 @@ enum GetBitsError {
 
 #[generate_trait]
 impl BitReaderImpl of BitReaderTrait {
-    fn new(source: @ByteArray) -> BitReader {
+    fn new(source: @ByteArraySlice) -> BitReader {
         BitReader { idx: 0, source }
     }
 
@@ -103,7 +103,7 @@ impl BitReaderImpl of BitReaderTrait {
         Result::Ok(value)
     }
 
-    fn reset(ref self: BitReader, new_source: @ByteArray) {
+    fn reset(ref self: BitReader, new_source: @ByteArraySlice) {
         self.idx = 0;
         self.source = new_source;
     }

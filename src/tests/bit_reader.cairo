@@ -5,6 +5,7 @@ use alexandria_math::BitShift;
 
 use cairo_zstd::decoding::bit_reader::{BitReaderTrait};
 use cairo_zstd::decoding::bit_reader_reverse::{BitReaderReversedTrait};
+use cairo_zstd::utils::byte_array::{ByteArraySliceTrait};
 
 #[test]
 #[available_gas(2000000000)]
@@ -14,7 +15,7 @@ fn test_bitreader_reversed() {
 
     let num_rev: u128 = 0x48_D5_2C_F7_BC_D4_79_42_96_C8_EC_00_00_08_41_C1;
 
-    let mut br = BitReaderReversedTrait::new(@ba);
+    let mut br = BitReaderReversedTrait::new(@ByteArraySliceTrait::new(@ba, 0, ba.len()));
     let mut accumulator: u128 = 0;
     let mut bits_read = 0;
     let mut x: u8 = 0;
@@ -56,7 +57,7 @@ fn test_bitreader_normal() {
 
     let num: u128 = 0x48_D5_2C_F7_BC_D4_79_42_96_C8_EC_00_00_08_41_C1;
 
-    let mut br = BitReaderTrait::new(@ba);
+    let mut br = BitReaderTrait::new(@ByteArraySliceTrait::new(@ba, 0, ba.len()));
     let mut accumulator: u128 = 0;
     let mut bits_read = 0;
     let mut x = 0;
