@@ -1,24 +1,25 @@
 use debug::PrintTrait;
-use core::corelib::src::fmt::Display;
-#[derive(Drop)]
+use fmt::Display;
+
+#[derive(Copy, Clone, Drop, PartialEq)]
 enum BlockType {
     Raw,
     RLE,
     Compressed,
-    Reserved
+    Reserved,
 }
 
 impl BlockTypeImpl of Display<BlockType> {
-    fn fmt(self: @BlockType, ref f: BlockType) -> Result<(), Error> {
+    fn fmt(self: @BlockType, ref f: Formatter) -> Result<(), Error> {
         match self {
-            BlockType::Raw => 'Raw'.print(),
-            BlockType::RLE => 'RLE'.print(),
-            BlockType::Compressed =>'Compressed'.print(),
-            BlockType::Reserved =>'Reserved'.print(),
+            BlockType::Raw => f.buffer.append("Raw"),
+            BlockType::RLE => f.buffer.append("RLE"),
+            BlockType::Compressed => f.buffer.append("Compressed"),
+            BlockType::Reserved => f.buffer.append("Reserved"),
         }
+        Result::Ok(());
     }
 }
-
 
 #[derive(Copy, Drop)]
 struct BlockHeader {
