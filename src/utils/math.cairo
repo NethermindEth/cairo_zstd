@@ -1,4 +1,6 @@
-use integer::BoundedInt;
+use integer::{BoundedInt, u64_wide_mul, u64_wrapping_add, u64_wrapping_sub};
+
+use alexandria_math::pow;
 
 impl I32TryIntoU32 of TryInto<i32, u32> {
     fn try_into(self: i32) -> Option<u32> {
@@ -278,5 +280,29 @@ impl IsPowerOfTwoImpl<
 > of IsPowerOfTwo<T> {
     fn is_power_of_two(self: T) -> bool {
         self != 0_u8.into() && (self & (self - 1_u8.into())) == 0_u8.into()
+    }
+}
+
+fn u64_wrapping_mul(lhs: u64, rhs: u64) -> u64 {
+    (u64_wide_mul(lhs, rhs) % 0x10000000000000000_u128).try_into().unwrap()
+}
+
+trait Wrapping<T> {
+    fn add(lhs: T, rhs: T) -> T;
+    fn sub(lhs: T, rhs: T) -> T;
+    fn mul(lhs: T, rhs: T) -> T;
+}
+
+impl WrappingU64 of Wrapping<u64> {
+    fn add(lhs: u64, rhs: u64) -> u64 {
+        u64_wrapping_add(lhs, rhs)
+    }
+
+    fn sub(lhs: u64, rhs: u64) -> u64 {
+        u64_wrapping_sub(lhs, rhs)
+    }
+
+    fn mul(lhs: u64, rhs: u64) -> u64 {
+        u64_wrapping_mul(lhs, rhs)
     }
 }
