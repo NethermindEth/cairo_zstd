@@ -56,30 +56,66 @@ trait ByteArrayTraitExtRead<T> {
 
 impl ByteArraySliceByteArrayTraitExtReadImpl of ByteArrayTraitExtRead<ByteArraySlice> {
     fn word_u16(self: @ByteArraySlice, offset: usize) -> Option<u16> {
-        (*self.data).word_u16(offset)
+        if offset >= *self.len {
+            return Option::None;
+        }
+
+        (*self.data).word_u16(offset + *self.from)
     }
+
     fn word_u16_le(self: @ByteArraySlice, offset: usize) -> Option<u16> {
-        (*self.data).word_u16_le(offset)
+        if offset >= *self.len {
+            return Option::None;
+        }
+
+        (*self.data).word_u16_le(offset + *self.from)
     }
+
     fn word_u32(self: @ByteArraySlice, offset: usize) -> Option<u32> {
-        (*self.data).word_u32(offset)
+        if offset >= *self.len {
+            return Option::None;
+        }
+
+        (*self.data).word_u32(offset + *self.from)
     }
+
     fn word_u32_le(self: @ByteArraySlice, offset: usize) -> Option<u32> {
-        (*self.data).word_u32_le(offset)
+        if offset >= *self.len {
+            return Option::None;
+        }
+
+        (*self.data).word_u32_le(offset + *self.from)
     }
+
     fn word_u64(self: @ByteArraySlice, offset: usize) -> Option<u64> {
-        (*self.data).word_u64(offset)
+        if offset >= *self.len {
+            return Option::None;
+        }
+
+        (*self.data).word_u64(offset + *self.from)
     }
+
     fn word_u64_le(self: @ByteArraySlice, offset: usize) -> Option<u64> {
-        (*self.data).word_u64_le(offset)
+        if offset >= *self.len {
+            return Option::None;
+        }
+
+        (*self.data).word_u64_le(offset + *self.from)
     }
+
     fn word_u128(self: @ByteArraySlice, offset: usize) -> Option<u128> {
-        (*self.data).word_u128(offset)
+        if offset >= *self.len {
+            return Option::None;
+        }
+
+        (*self.data).word_u128(offset + *self.from)
     }
+
     fn word_u128_le(self: @ByteArraySlice, offset: usize) -> Option<u128> {
-        (*self.data).word_u128_le(offset)
-    }
-    fn reader(self: @ByteArraySlice) -> ByteArrayReader {
-        (*self.data).reader()
+        if offset >= *self.len {
+            return Option::None;
+        }
+
+        (*self.data).word_u128_le(offset + *self.from)
     }
 }
