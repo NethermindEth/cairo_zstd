@@ -1,4 +1,7 @@
+use byte_array::{ByteArrayStringLiteral};
+
 use cairo_zstd::utils::math::{Bits, LeadingZeros, HighestBitSet, IsPowerOfTwo};
+use cairo_zstd::utils::xxhash64::XxHash64Trait;
 
 #[test]
 fn test_bits() {
@@ -123,4 +126,34 @@ fn _test_is_power_of_two<
 
         i += 1;
     };
+}
+
+#[test]
+#[available_gas(2000000000)]
+fn test_checksum() {
+    _test_checksum(0xef46db3751d8e999, @"");
+    _test_checksum(0xd24ec4f1a98c6e5b, @"a");
+    _test_checksum(0x65f708ca92d04a61, @"ab");
+    _test_checksum(0x44bc2cf5ad770999, @"abc");
+    _test_checksum(0xde0327b0d25d92cc, @"abcd");
+    _test_checksum(0x07e3670c0c8dc7eb, @"abcde");
+    _test_checksum(0xfa8afd82c423144d, @"abcdef");
+    _test_checksum(0x1860940e2902822d, @"abcdefg");
+    _test_checksum(0x3ad351775b4634b7, @"abcdefgh");
+    _test_checksum(0x27f1a34fdbb95e13, @"abcdefghi");
+    _test_checksum(0xd6287a1de5498bb2, @"abcdefghij");
+    _test_checksum(0xbf2cd639b4143b80, @"abcdefghijklmnopqrstuvwxyz012345");
+    _test_checksum(0x64f23ecf1609b766, @"abcdefghijklmnopqrstuvwxyz0123456789");
+    _test_checksum(
+        0xc5a8b11443765630,
+        @"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    );
+}
+
+fn _test_checksum(sum: u64, input: @ByteArray) {
+    let mut hash = XxHash64Trait::new(0);
+
+    hash.update(input);
+
+    assert(hash.digest() == sum, '');
 }
