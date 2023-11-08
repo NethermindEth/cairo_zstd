@@ -115,7 +115,7 @@ impl XxHash64Impl of XxHash64Trait {
 
 #[inline]
 fn round(acc: u64, input: u64) -> u64 {
-    Wrapping::mul(rol31(Wrapping::add(acc, Wrapping::mul(input, PRIME_2)), 31), PRIME_1)
+    Wrapping::mul(rol31(Wrapping::add(acc, Wrapping::mul(input, PRIME_2))), PRIME_1)
 }
 
 #[inline]
