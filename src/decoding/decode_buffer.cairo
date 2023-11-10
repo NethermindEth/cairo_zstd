@@ -3,12 +3,12 @@ use byte_array::{ByteArray, ByteArrayTrait};
 
 use cairo_zstd::decoding::ring_buffer::{RingBuffer, RingBufferTrait};
 use cairo_zstd::utils::xxhash64::{XxHash64, XxHash64Trait};
-use cairo_zstd::utils::byte_array::{ByteArraySliceTrait, ByteArrayExtendSliceImpl};
+use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait, ByteArrayExtendSliceImpl};
 
 #[derive(Drop)]
 struct DecodeBuffer {
     buffer: RingBuffer,
-    dict_content: ByteArray,
+    dict_content: ByteArraySlice,
     window_size: usize,
     total_output_counter: u64,
     hash: XxHash64,
@@ -70,11 +70,9 @@ impl DecodeBufferImpl of DecodeBufferTrait {
                 }
 
                 if bytes_from_dict < match_length {
-                    let dict_slice = ByteArraySliceTrait::new(
-                        @self.dict_content,
-                        self.dict_content.len() - bytes_from_dict,
-                        self.dict_content.len()
-                    );
+                    let dict_slice = self
+                        .dict_content
+                        .slice(self.dict_content.len() - bytes_from_dict, self.dict_content.len());
                     self.buffer.extend_slice(dict_slice);
 
                     self.total_output_counter += bytes_from_dict.into();
@@ -82,7 +80,7 @@ impl DecodeBufferImpl of DecodeBufferTrait {
                 } else {
                     let low = self.dict_content.len() - bytes_from_dict;
                     let high = low + match_length;
-                    let dict_slice = ByteArraySliceTrait::new(@self.dict_content, low, high);
+                    let dict_slice = self.dict_content.slice(low, high);
                     self.buffer.extend_slice(dict_slice);
                 }
             } else {
