@@ -1,7 +1,7 @@
 use byte_array::{ByteArray, ByteArrayTrait};
 use cmp::min;
 
-use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait};
+use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait, ByteArrayExtendSliceImpl};
 
 // Only a byte array wrapper for now
 
@@ -9,13 +9,12 @@ use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait};
 struct RingBuffer {
     elements: ByteArray,
     head: usize,
-    tail: usize,
 }
 
 #[generate_trait]
 impl RingBufferImpl of RingBufferTrait {
     fn new() -> RingBuffer {
-        RingBuffer { elements: Default::default(), head: 0, tail: 0, }
+        RingBuffer { elements: Default::default(), head: 0 }
     }
 
     fn len(self: @RingBuffer) -> usize {
@@ -23,7 +22,9 @@ impl RingBufferImpl of RingBufferTrait {
     }
 
     #[inline(always)]
-    fn clear(ref self: RingBuffer) { // no-op
+    fn clear(ref self: RingBuffer) {
+        self.elements = Default::default();
+        self.head = 0;
     }
 
     fn is_empty(self: @RingBuffer) -> bool {
@@ -36,16 +37,18 @@ impl RingBufferImpl of RingBufferTrait {
 
     fn push_back(ref self: RingBuffer, byte: u8) {
         self.elements.append_byte(byte);
-        self.tail += 1;
     }
 
     fn get(self: @RingBuffer, idx: usize) -> Option<u8> {
-        self.elements.at(idx)
+        self.elements.at(*self.head + idx)
     }
 
     fn extend(ref self: RingBuffer, data: @ByteArray) {
         self.elements.append(data);
-        self.tail += data.len()
+    }
+
+    fn extend_slice(ref self: RingBuffer, data: ByteArraySlice) {
+        self.elements.extend_slice(data);
     }
 
     fn drop_first_n(ref self: RingBuffer, amount: usize) {
@@ -56,6 +59,6 @@ impl RingBufferImpl of RingBufferTrait {
     }
 
     fn as_slice(self: @RingBuffer) -> ByteArraySlice {
-        ByteArraySliceTrait::new(self.elements, *self.head, *self.tail)
+        ByteArraySliceTrait::new(self.elements, *self.head, self.elements.len())
     }
 }

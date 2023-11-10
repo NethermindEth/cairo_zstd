@@ -1,3 +1,5 @@
+use cmp::min;
+use bytes_31::BYTES_IN_BYTES31;
 use byte_array::ByteArray;
 
 use alexandria_data_structures::byte_array_ext::ByteArrayTraitExt;
@@ -117,5 +119,27 @@ impl ByteArraySliceByteArrayTraitExtReadImpl of ByteArrayTraitExtRead<ByteArrayS
         }
 
         (*self.data).word_u128_le(offset + *self.from)
+    }
+}
+
+#[generate_trait]
+impl ByteArrayExtendSliceImpl of ByteArraySliceExtendTrait {
+    fn extend_slice(ref self: ByteArray, input: ByteArraySlice) {
+        let mut i: usize = 0;
+        loop {
+            let len = min(input.len() - i * 31, BYTES_IN_BYTES31);
+
+            if len == 0 {
+                break;
+            }
+
+            if len == BYTES_IN_BYTES31 {
+                self.append_word((*input.data.data.at(i)).into(), len);
+            } else {
+                self.append_word(*input.data.pending_word, len)
+            }
+
+            i += 1;
+        };
     }
 }
