@@ -22,7 +22,9 @@ impl RingBufferImpl of RingBufferTrait {
     }
 
     #[inline(always)]
-    fn clear(ref self: RingBuffer) { // no-op
+    fn clear(ref self: RingBuffer) {
+        self.elements = Default::default();
+        self.head = 0;
     }
 
     fn is_empty(self: @RingBuffer) -> bool {
