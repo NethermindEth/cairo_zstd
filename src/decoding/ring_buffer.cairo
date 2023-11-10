@@ -9,13 +9,12 @@ use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait};
 struct RingBuffer {
     elements: ByteArray,
     head: usize,
-    tail: usize,
 }
 
 #[generate_trait]
 impl RingBufferImpl of RingBufferTrait {
     fn new() -> RingBuffer {
-        RingBuffer { elements: Default::default(), head: 0, tail: 0, }
+        RingBuffer { elements: Default::default(), head: 0 }
     }
 
     fn len(self: @RingBuffer) -> usize {
@@ -36,7 +35,6 @@ impl RingBufferImpl of RingBufferTrait {
 
     fn push_back(ref self: RingBuffer, byte: u8) {
         self.elements.append_byte(byte);
-        self.tail += 1;
     }
 
     fn get(self: @RingBuffer, idx: usize) -> Option<u8> {
@@ -45,7 +43,6 @@ impl RingBufferImpl of RingBufferTrait {
 
     fn extend(ref self: RingBuffer, data: @ByteArray) {
         self.elements.append(data);
-        self.tail += data.len()
     }
 
     fn drop_first_n(ref self: RingBuffer, amount: usize) {
@@ -56,6 +53,6 @@ impl RingBufferImpl of RingBufferTrait {
     }
 
     fn as_slice(self: @RingBuffer) -> ByteArraySlice {
-        ByteArraySliceTrait::new(self.elements, *self.head, *self.tail)
+        ByteArraySliceTrait::new(self.elements, *self.head, self.elements.len())
     }
 }
