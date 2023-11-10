@@ -1,7 +1,7 @@
 use byte_array::{ByteArray, ByteArrayTrait};
 use cmp::min;
 
-use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait};
+use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait, ByteArrayExtendSliceImpl};
 
 // Only a byte array wrapper for now
 
@@ -45,6 +45,10 @@ impl RingBufferImpl of RingBufferTrait {
 
     fn extend(ref self: RingBuffer, data: @ByteArray) {
         self.elements.append(data);
+    }
+
+    fn extend_slice(ref self: RingBuffer, data: ByteArraySlice) {
+        self.elements.extend_slice(data);
     }
 
     fn drop_first_n(ref self: RingBuffer, amount: usize) {
