@@ -3,6 +3,7 @@ mod decoding;
 mod fse;
 mod huff0;
 mod utils;
+mod frame;
 
 #[cfg(test)]
 mod tests;
