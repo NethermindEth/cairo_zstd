@@ -40,7 +40,7 @@ impl RingBufferImpl of RingBufferTrait {
     }
 
     fn get(self: @RingBuffer, idx: usize) -> Option<u8> {
-        self.elements.at(idx)
+        self.elements.at(*self.head + idx)
     }
 
     fn extend(ref self: RingBuffer, data: @ByteArray) {
