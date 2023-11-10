@@ -167,7 +167,9 @@ impl HuffmanTableImpl of HuffmanTableTrait {
         self.fse_table.reset();
     }
 
-    fn build_decoder(ref self: HuffmanTable, source: @ByteArray) -> Result<u32, HuffmanTableError> {
+    fn build_decoder(
+        ref self: HuffmanTable, source: ByteArraySlice
+    ) -> Result<u32, HuffmanTableError> {
         self.decode.clear();
 
         let bytes_used = self.read_weights(source)?;
@@ -175,7 +177,9 @@ impl HuffmanTableImpl of HuffmanTableTrait {
         Result::Ok(bytes_used)
     }
 
-    fn read_weights(ref self: HuffmanTable, source: @ByteArray) -> Result<u32, HuffmanTableError> {
+    fn read_weights(
+        ref self: HuffmanTable, source: ByteArraySlice
+    ) -> Result<u32, HuffmanTableError> {
         if source.len() == 0 {
             return Result::Err(HuffmanTableError::SourceIsEmpty);
         }
@@ -183,7 +187,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
         let mut bits_read = 8;
 
         if header >= 0 && header <= 127 {
-            let fse_stream = ByteArraySliceTrait::new(source, 1, source.len());
+            let fse_stream = source.slice(1, source.len());
 
             if header.into() > fse_stream.len() {
                 return Result::Err(
@@ -293,7 +297,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
                 return Result::Err(result.unwrap_err());
             }
         } else {
-            let weights_raw = ByteArraySliceTrait::new(source, 1, source.len());
+            let weights_raw = source.slice(1, source.len());
             let num_weights = header - 127;
             self.weights.resize(num_weights.into(), 0);
 

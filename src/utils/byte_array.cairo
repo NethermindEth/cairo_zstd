@@ -122,6 +122,12 @@ impl ByteArraySliceByteArrayTraitExtReadImpl of ByteArrayTraitExtRead<ByteArrayS
     }
 }
 
+impl ByteArraySliceDefault of Default<ByteArraySlice> {
+    fn default() -> ByteArraySlice {
+        ByteArraySliceTrait::new(Default::default(), 0, 0)
+    }
+}
+
 #[generate_trait]
 impl ByteArrayExtendSliceImpl of ByteArraySliceExtendTrait {
     fn extend_slice(ref self: ByteArray, input: ByteArraySlice) {
