@@ -105,9 +105,7 @@ impl HuffmanDecoderImpl of HuffmanDecoderTrait {
         let num_bits = self.table.max_num_bits;
         let new_bits = match br.get_bits(num_bits) {
             Result::Ok(val) => val,
-            Result::Err(err) => {
-                return Result::Err(HuffmanDecoderError::GetBitsError(err));
-            }
+            Result::Err(err) => { return Result::Err(HuffmanDecoderError::GetBitsError(err)); }
         };
         self.state = new_bits;
         Result::Ok(num_bits)
@@ -120,9 +118,7 @@ impl HuffmanDecoderImpl of HuffmanDecoderTrait {
         let num_bits = entry.num_bits;
         let new_bits = match br.get_bits(num_bits) {
             Result::Ok(val) => val,
-            Result::Err(err) => {
-                return Result::Err(HuffmanDecoderError::GetBitsError(err));
-            }
+            Result::Err(err) => { return Result::Err(HuffmanDecoderError::GetBitsError(err)); }
         };
         self.state = BitShift::shl(self.state, num_bits.into());
         self.state = self.state & (self.table.decode.len().into() - 1);
@@ -196,9 +192,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
             }
             let bytes_used_by_fse_header = match self.fse_table.build_decoder(fse_stream, 100) {
                 Result::Ok(val) => val,
-                Result::Err(err) => {
-                    return Result::Err(HuffmanTableError::FSETableError(err));
-                },
+                Result::Err(err) => { return Result::Err(HuffmanTableError::FSETableError(err)); },
             };
 
             if bytes_used_by_fse_header > header.into() {

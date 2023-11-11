@@ -1,5 +1,15 @@
-use debug::PrintTrait;
-use fmt::Display;
+// #[derive(Drop)]
+// struct Error {}
+
+// #[derive(Default, Drop)]
+// struct Formatter {
+//     /// The pending result of formatting.
+//     buffer: ByteArray,
+// }
+
+// trait Display<T> {
+//     fn fmt(self: @T, ref f: Formatter) -> Result<(), Error>;
+// }
 
 #[derive(Copy, Clone, Drop, PartialEq)]
 enum BlockType {
@@ -9,17 +19,17 @@ enum BlockType {
     Reserved,
 }
 
-impl BlockTypeImpl of Display<BlockType> {
-    fn fmt(self: @BlockType, ref f: Formatter) -> Result<(), Error> {
-        match self {
-            BlockType::Raw => f.buffer.append("Raw"),
-            BlockType::RLE => f.buffer.append("RLE"),
-            BlockType::Compressed => f.buffer.append("Compressed"),
-            BlockType::Reserved => f.buffer.append("Reserved"),
-        }
-        Result::Ok(());
-    }
-}
+// impl BlockTypeDisplayImpl of Display<BlockType>{
+//     fn fmt(self: @BlockType, ref f: Formatter) -> Result<(), Error> {
+//         match self {
+//             BlockType::Raw => f.buffer.append("Raw").print();
+//             BlockType::RLE => f.buffer.append("RLE"),
+//             BlockType::Compressed => f.buffer.append("Compressed"),
+//             BlockType::Reserved => f.buffer.append("Reserved"),
+//         }
+//         Result::Ok(());
+//     }
+// }
 
 #[derive(Copy, Drop)]
 struct BlockHeader {
