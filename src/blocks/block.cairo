@@ -1,4 +1,3 @@
-
 #[derive(Copy, Debug, Clone, Drop, PartialEq, Eq)]
 enum BlockType {
     Raw,
