@@ -44,7 +44,6 @@ enum HuffmanTableError {
 
 #[derive(Destruct)]
 struct HuffmanDecoder {
-    table: HuffmanTable,
     state: u64,
 }
 
@@ -69,20 +68,20 @@ const MAX_MAX_NUM_BITS: u8 = 11;
 
 #[generate_trait]
 impl HuffmanDecoderImpl of HuffmanDecoderTrait {
-    fn new(table: HuffmanTable) -> HuffmanDecoder {
-        HuffmanDecoder { table, state: 0 }
+    fn new() -> HuffmanDecoder {
+        HuffmanDecoder { state: 0 }
     }
 
-    fn decode_symbol(ref self: HuffmanDecoder) -> u8 {
-        let entry: Entry = self.table.decode[self.state.try_into().unwrap()];
+    fn decode_symbol(ref self: HuffmanDecoder, ref table: HuffmanTable) -> u8 {
+        let entry: Entry = table.decode[self.state.try_into().unwrap()];
 
         entry.symbol
     }
 
     fn init_state(
-        ref self: HuffmanDecoder, ref br: BitReaderReversed,
+        ref self: HuffmanDecoder, ref table: HuffmanTable, ref br: BitReaderReversed,
     ) -> Result<u8, HuffmanDecoderError> {
-        let num_bits = self.table.max_num_bits;
+        let num_bits = table.max_num_bits;
         let new_bits = match br.get_bits(num_bits) {
             Result::Ok(val) => val,
             Result::Err(err) => { return Result::Err(HuffmanDecoderError::GetBitsError(err)); }
@@ -92,16 +91,16 @@ impl HuffmanDecoderImpl of HuffmanDecoderTrait {
     }
 
     fn next_state(
-        ref self: HuffmanDecoder, ref br: BitReaderReversed,
+        ref self: HuffmanDecoder, ref table: HuffmanTable, ref br: BitReaderReversed,
     ) -> Result<u8, HuffmanDecoderError> {
-        let entry: Entry = self.table.decode[self.state.try_into().unwrap()];
+        let entry: Entry = table.decode[self.state.try_into().unwrap()];
         let num_bits = entry.num_bits;
         let new_bits = match br.get_bits(num_bits) {
             Result::Ok(val) => val,
             Result::Err(err) => { return Result::Err(HuffmanDecoderError::GetBitsError(err)); }
         };
         self.state = BitShift::shl(self.state, num_bits.into());
-        self.state = self.state & (self.table.decode.len().into() - 1);
+        self.state = self.state & (table.decode.len().into() - 1);
         self.state = self.state | new_bits;
         Result::Ok(num_bits)
     }
@@ -225,13 +224,13 @@ impl HuffmanTableImpl of HuffmanTableTrait {
                 return Result::Err(HuffmanTableError::ExtraPadding((skipped_bits,)));
             }
 
-            match dec1.init_state(ref br) {
+            match dec1.init_state(ref self.fse_table, ref br) {
                 Result::Ok(()) => {},
                 Result::Err(err) => {
                     return Result::Err(HuffmanTableError::FSEDecoderError(err));
                 },
             };
-            match dec2.init_state(ref br) {
+            match dec2.init_state(ref self.fse_table, ref br) {
                 Result::Ok(()) => {},
                 Result::Err(err) => {
                     return Result::Err(HuffmanTableError::FSEDecoderError(err));
@@ -244,7 +243,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
                 let w = dec1.decode_symbol();
                 self.weights.push(w);
 
-                match dec1.update_state(ref br) {
+                match dec1.update_state(ref self.fse_table, ref br) {
                     Result::Ok(()) => {},
                     Result::Err(err) => {
                         break Result::Err(HuffmanTableError::FSEDecoderError(err));
@@ -258,7 +257,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
 
                 let w = dec2.decode_symbol();
                 self.weights.push(w);
-                match dec2.update_state(ref br) {
+                match dec2.update_state(ref self.fse_table, ref br) {
                     Result::Ok(()) => {},
                     Result::Err(err) => {
                         break Result::Err(HuffmanTableError::FSEDecoderError(err));
