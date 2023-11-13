@@ -287,13 +287,13 @@ fn u64_wrapping_mul(lhs: u64, rhs: u64) -> u64 {
     (u64_wide_mul(lhs, rhs) % 0x10000000000000000_u128).try_into().unwrap()
 }
 
-trait Wrapping<T> {
+trait WrappingMath<T> {
     fn wrapping_add(self: @T, rhs: T) -> T;
     fn wrapping_sub(self: @T, rhs: T) -> T;
     fn wrapping_mul(self: @T, rhs: T) -> T;
 }
 
-impl WrappingU64 of Wrapping<u64> {
+impl WrappingMathU64 of WrappingMath<u64> {
     fn wrapping_add(self: @u64, rhs: u64) -> u64 {
         u64_wrapping_add(*self, rhs)
     }

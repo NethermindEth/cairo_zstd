@@ -2,7 +2,7 @@ use alexandria_math::{BitShift};
 use alexandria_data_structures::byte_array_ext::{ByteArrayTraitExt};
 use alexandria_data_structures::byte_array_reader::{ByteArrayReaderTrait};
 
-use cairo_zstd::utils::math::{Bits, Wrapping};
+use cairo_zstd::utils::math::WrappingMath;
 use cairo_zstd::utils::byte_array::{ByteArraySliceTrait, ByteArrayTraitExtRead};
 
 // Based on the Rust and Zig implementations at, respectively:
