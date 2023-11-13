@@ -8,7 +8,7 @@ use cairo_zstd::fse::fse_decoder::{FSETableTrait, FSETableError};
 use cairo_zstd::huff0::huff0_decoder::{HuffmanTableTrait, HuffmanTableError};
 use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait, ByteArrayTraitExtRead};
 
-#[derive(Drop)]
+#[derive(Destruct)]
 struct Dictionary {
     id: u32,
     fse: FSEScratch,

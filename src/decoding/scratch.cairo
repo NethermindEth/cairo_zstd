@@ -8,12 +8,12 @@ use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait};
 
 #[derive(Clone, Copy, Drop)]
 struct Sequence {
-    _ll: u32,
-    _ml: u32,
-    _of: u32,
+    literals_length: u32,
+    match_length: u32,
+    offset: u32,
 }
 
-#[derive(Drop)]
+#[derive(Destruct)]
 struct DecoderScratch {
     huf: HuffmanScratch,
     fse: FSEScratch,
@@ -71,7 +71,7 @@ impl DecoderScratchImpl of DecoderScratchTrait {
     }
 }
 
-#[derive(Drop)]
+#[derive(Destruct)]
 struct HuffmanScratch {
     table: HuffmanTable,
 }
@@ -89,7 +89,7 @@ impl HuffmanScratchDefault of Default<HuffmanScratch> {
     }
 }
 
-#[derive(Drop)]
+#[derive(Destruct)]
 struct FSEScratch {
     offsets: FSETable,
     of_rle: Option<u8>,

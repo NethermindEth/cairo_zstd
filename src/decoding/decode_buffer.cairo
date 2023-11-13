@@ -49,8 +49,8 @@ impl DecodeBufferImpl of DecodeBufferTrait {
         self.buffer.is_empty()
     }
 
-    fn push(ref self: DecodeBuffer, data: @ByteArray) {
-        self.buffer.extend(data);
+    fn push(ref self: DecodeBuffer, data: ByteArraySlice) {
+        self.buffer.extend_slice(data);
         self.total_output_counter += data.len().into();
     }
 
