@@ -1,5 +1,5 @@
-use cairo_zstd::decoding::bit_reader::{GetBitsError};
-use alexandria_math::{BitShift, pow};
+use cairo_zstd::decoding::bit_reader::GetBitsError;
+use alexandria_math::BitShift;
 
 struct LiteralsSection {
     regenerated_size: u32,
