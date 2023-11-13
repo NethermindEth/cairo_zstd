@@ -13,7 +13,7 @@ struct Sequence {
     offset: u32,
 }
 
-#[derive(Drop)]
+#[derive(Destruct)]
 struct DecoderScratch {
     huf: HuffmanScratch,
     fse: FSEScratch,
@@ -71,7 +71,7 @@ impl DecoderScratchImpl of DecoderScratchTrait {
     }
 }
 
-#[derive(Drop)]
+#[derive(Destruct)]
 struct HuffmanScratch {
     table: HuffmanTable,
 }
@@ -89,7 +89,7 @@ impl HuffmanScratchDefault of Default<HuffmanScratch> {
     }
 }
 
-#[derive(Drop)]
+#[derive(Destruct)]
 struct FSEScratch {
     offsets: FSETable,
     of_rle: Option<u8>,

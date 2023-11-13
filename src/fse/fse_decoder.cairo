@@ -1,5 +1,5 @@
 use alexandria_math::BitShift;
-use alexandria_data_structures::vec::{VecTrait, Felt252Vec};
+use alexandria_data_structures::vec::{VecTrait, Felt252Vec, NullableVec};
 use alexandria_data_structures::byte_array_ext::{ByteArrayTraitExt};
 
 use cairo_zstd::decoding::bit_reader::{BitReaderTrait, GetBitsError};
@@ -7,29 +7,21 @@ use cairo_zstd::decoding::bit_reader_reverse::{BitReaderReversed, BitReaderRever
 use cairo_zstd::utils::math::{
     I32Felt252DictValue, HighestBitSet, HighestBitSetImpl, U64TryIntoI32, I32TryIntoU32
 };
-use cairo_zstd::utils::vec::{
-    Concat, SpanIntoVec, Clear, Felt252VecClear, Felt252VecResize, Reserve
-};
+use cairo_zstd::utils::vec::{Concat, SpanIntoVec, Clear, Felt252VecClear, Reserve, Resize};
 use cairo_zstd::utils::byte_array::ByteArraySlice;
 
-impl Felt252DictEntryDrop of Drop<Felt252Dict<Entry>>;
-impl Felt252DictEntryCopy of Copy<Felt252Dict<Entry>>;
-impl Felt252VecEntryDrop of Drop<Felt252Vec<Entry>>;
-impl Felt252VecEntryCopy of Copy<Felt252Vec<Entry>>;
-impl Felt252DictI32Drop of Drop<Felt252Dict<i32>>;
-impl Felt252DictI32Copy of Copy<Felt252Dict<i32>>;
-impl Felt252VecI32Drop of Drop<Felt252Vec<i32>>;
-impl Felt252VecI32Copy of Copy<Felt252Vec<i32>>;
-impl Felt252DictU32Drop of Drop<Felt252Dict<u32>>;
-impl Felt252DictU32Copy of Copy<Felt252Dict<u32>>;
-impl Felt252VecU32Drop of Drop<Felt252Vec<u32>>;
-impl Felt252VecU32Copy of Copy<Felt252Vec<u32>>;
+impl NullableFelt252DictEntryCopyImpl of Copy<Felt252Dict<Nullable<Entry>>>;
+impl NullableVecEntryCopyImpl of Copy<NullableVec<Entry>>;
+impl NullableFelt252DictI32CopyImpl of Copy<Felt252Dict<Nullable<i32>>>;
+impl NullableVecI32CopyImpl of Copy<NullableVec<i32>>;
+impl Felt252DictU32CopyImpl of Copy<Felt252Dict<u32>>;
+impl Felt252VecU32CopyImpl of Copy<Felt252Vec<u32>>;
 
-#[derive(Copy, Drop)]
+#[derive(Copy, Destruct)]
 struct FSETable {
-    decode: Felt252Vec<Entry>,
+    decode: NullableVec<Entry>,
     accuracy_log: u8,
-    symbol_probabilities: Felt252Vec<i32>,
+    symbol_probabilities: NullableVec<i32>,
     symbol_counter: Felt252Vec<u32>,
 }
 
@@ -48,7 +40,7 @@ enum FSETableError {
     GetBitsError: GetBitsError,
 }
 
-#[derive(Drop)]
+#[derive(Destruct)]
 struct FSEDecoder {
     state: Entry,
     table: FSETable,
@@ -60,7 +52,7 @@ enum FSEDecoderError {
     TableIsUninitialized,
 }
 
-#[derive(Copy, Clone, Drop)]
+#[derive(Copy, Drop)]
 struct Entry {
     base_line: u32,
     num_bits: u8,
@@ -123,9 +115,9 @@ impl FSEDecoderImpl of FSEDecoderTrait {
 impl FSETableImpl of FSETableTrait {
     fn new() -> FSETable {
         FSETable {
-            symbol_probabilities: VecTrait::<Felt252Vec, i32>::new(),
+            symbol_probabilities: VecTrait::<NullableVec, i32>::new(),
             symbol_counter: VecTrait::<Felt252Vec, u32>::new(),
-            decode: VecTrait::<Felt252Vec, Entry>::new(),
+            decode: VecTrait::<NullableVec, Entry>::new(),
             accuracy_log: 0,
         }
     }
@@ -140,8 +132,8 @@ impl FSETableImpl of FSETableTrait {
 
     fn reset(ref self: FSETable) {
         self.symbol_counter = VecTrait::<Felt252Vec, u32>::new();
-        self.symbol_probabilities = VecTrait::<Felt252Vec, i32>::new();
-        self.decode = VecTrait::<Felt252Vec, Entry>::new();
+        self.symbol_probabilities = VecTrait::<NullableVec, i32>::new();
+        self.decode = VecTrait::<NullableVec, Entry>::new();
         self.accuracy_log = 0;
     }
 

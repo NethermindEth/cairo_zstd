@@ -1,7 +1,7 @@
 use byte_array::ByteArray;
 
 use alexandria_math::BitShift;
-use alexandria_data_structures::vec::{VecTrait, Felt252Vec};
+use alexandria_data_structures::vec::{VecTrait, Felt252Vec, NullableVec};
 
 use cairo_zstd::decoding::bit_reader_reverse::{
     BitReaderReversed, BitReaderReversedTrait, GetBitsError
@@ -13,22 +13,9 @@ use cairo_zstd::utils::math::{HighestBitSet, IsPowerOfTwo};
 use cairo_zstd::utils::vec::{Concat, Clear, Resize};
 use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait};
 
-impl Felt252DictEntryDrop of Drop<Felt252Dict<Entry>>;
-impl Felt252DictEntryCopy of Copy<Felt252Dict<Entry>>;
-impl Felt252VecEntryDrop of Drop<Felt252Vec<Entry>>;
-impl Felt252VecEntryCopy of Copy<Felt252Vec<Entry>>;
-impl Felt252DictU8Drop of Drop<Felt252Dict<u8>>;
-impl Felt252DictU8Copy of Copy<Felt252Dict<u8>>;
-impl Felt252VecU8Drop of Drop<Felt252Vec<u8>>;
-impl Felt252VecU8Copy of Copy<Felt252Vec<u8>>;
-impl Felt252DictU32Drop of Drop<Felt252Dict<u32>>;
-impl Felt252DictU32Copy of Copy<Felt252Dict<u32>>;
-impl Felt252VecU32Drop of Drop<Felt252Vec<u32>>;
-impl Felt252VecU32Copy of Copy<Felt252Vec<u32>>;
-
-#[derive(Copy, Drop)]
+#[derive(Destruct)]
 struct HuffmanTable {
-    decode: Felt252Vec<Entry>,
+    decode: NullableVec<Entry>,
     weights: Felt252Vec<u8>,
     max_num_bits: u8,
     bits: Felt252Vec<u8>,
@@ -55,7 +42,7 @@ enum HuffmanTableError {
     FSETableError: FSETableError,
 }
 
-#[derive(Copy, Drop)]
+#[derive(Destruct)]
 struct HuffmanDecoder {
     table: HuffmanTable,
     state: u64,
@@ -66,7 +53,7 @@ enum HuffmanDecoderError {
     GetBitsError: GetBitsError,
 }
 
-#[derive(Copy, Clone, Drop)]
+#[derive(Copy, Drop)]
 struct Entry {
     symbol: u8,
     num_bits: u8,
@@ -84,13 +71,6 @@ const MAX_MAX_NUM_BITS: u8 = 11;
 impl HuffmanDecoderImpl of HuffmanDecoderTrait {
     fn new(table: HuffmanTable) -> HuffmanDecoder {
         HuffmanDecoder { table, state: 0 }
-    }
-
-    fn reset(ref self: HuffmanDecoder, new_table: Option<HuffmanTable>) {
-        self.state = 0;
-        if new_table.is_some() {
-            self.table = new_table.unwrap();
-        }
     }
 
     fn decode_symbol(ref self: HuffmanDecoder) -> u8 {
@@ -489,4 +469,3 @@ impl HuffmanTableImpl of HuffmanTableTrait {
         Result::Ok(())
     }
 }
-
