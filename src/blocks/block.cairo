@@ -9,7 +9,7 @@ enum BlockType {
 // impl BlockTypeDisplayImpl of Display<BlockType>{
 //     fn fmt(self: @BlockType, ref f: Formatter) -> Result<(), Error> {
 //         match self {
-//             BlockType::Raw => f.buffer.append("Raw").print();
+//             BlockType::Raw => f.buffer.append("Raw"),
 //             BlockType::RLE => f.buffer.append("RLE"),
 //             BlockType::Compressed => f.buffer.append("Compressed"),
 //             BlockType::Reserved => f.buffer.append("Reserved"),
