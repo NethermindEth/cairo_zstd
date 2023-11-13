@@ -21,7 +21,6 @@ enum ModeType {
     Repeat,
 }
 
-
 enum SequencesHeaderParseError {
     need_at_least: u8,
     got: usize,

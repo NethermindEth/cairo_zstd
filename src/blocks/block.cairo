@@ -1,17 +1,5 @@
-// #[derive(Drop)]
-// struct Error {}
 
-// #[derive(Default, Drop)]
-// struct Formatter {
-//     /// The pending result of formatting.
-//     buffer: ByteArray,
-// }
-
-// trait Display<T> {
-//     fn fmt(self: @T, ref f: Formatter) -> Result<(), Error>;
-// }
-
-#[derive(Copy, Clone, Drop, PartialEq)]
+#[derive(Copy, Debug, Clone, Drop, PartialEq, Eq)]
 enum BlockType {
     Raw,
     RLE,
