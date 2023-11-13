@@ -8,9 +8,9 @@ use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait};
 
 #[derive(Clone, Copy, Drop)]
 struct Sequence {
-    _ll: u32,
-    _ml: u32,
-    _of: u32,
+    literals_length: u32,
+    match_length: u32,
+    offset: u32,
 }
 
 #[derive(Drop)]
