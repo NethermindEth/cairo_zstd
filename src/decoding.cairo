@@ -4,3 +4,4 @@ mod ring_buffer;
 mod decode_buffer;
 mod dictionary;
 mod scratch;
+mod sequence_execution;
