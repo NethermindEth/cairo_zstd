@@ -288,21 +288,21 @@ fn u64_wrapping_mul(lhs: u64, rhs: u64) -> u64 {
 }
 
 trait Wrapping<T> {
-    fn add(lhs: T, rhs: T) -> T;
-    fn sub(lhs: T, rhs: T) -> T;
-    fn mul(lhs: T, rhs: T) -> T;
+    fn wrapping_add(self: @T, rhs: T) -> T;
+    fn wrapping_sub(self: @T, rhs: T) -> T;
+    fn wrapping_mul(self: @T, rhs: T) -> T;
 }
 
 impl WrappingU64 of Wrapping<u64> {
-    fn add(lhs: u64, rhs: u64) -> u64 {
-        u64_wrapping_add(lhs, rhs)
+    fn wrapping_add(self: @u64, rhs: u64) -> u64 {
+        u64_wrapping_add(*self, rhs)
     }
 
-    fn sub(lhs: u64, rhs: u64) -> u64 {
-        u64_wrapping_sub(lhs, rhs)
+    fn wrapping_sub(self: @u64, rhs: u64) -> u64 {
+        u64_wrapping_sub(*self, rhs)
     }
 
-    fn mul(lhs: u64, rhs: u64) -> u64 {
-        u64_wrapping_mul(lhs, rhs)
+    fn wrapping_mul(self: @u64, rhs: u64) -> u64 {
+        u64_wrapping_mul(*self, rhs)
     }
 }

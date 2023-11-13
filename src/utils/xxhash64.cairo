@@ -33,10 +33,10 @@ impl XxHash64Impl of XxHash64Trait {
         XxHash64 {
             seed: seed,
             total_len: 0,
-            v1: Wrapping::add(Wrapping::add(seed, PRIME_1), PRIME_2),
-            v2: Wrapping::add(seed, PRIME_2),
+            v1: seed.wrapping_add(PRIME_1).wrapping_add(PRIME_2),
+            v2: seed.wrapping_add(PRIME_2),
             v3: seed,
-            v4: Wrapping::sub(seed, PRIME_1),
+            v4: seed.wrapping_sub(PRIME_1),
             mem: Default::default(),
         }
     }
@@ -93,21 +93,20 @@ impl XxHash64Impl of XxHash64Trait {
         let mut result: u64 = 0;
 
         if *self.total_len >= CHUNK_SIZE {
-            result =
-                Wrapping::add(
-                    Wrapping::add(Wrapping::add(rol1(*self.v1), rol7(*self.v2)), rol12(*self.v3)),
-                    rol18(*self.v4)
-                );
+            result = rol1(*self.v1)
+                .wrapping_add(rol7(*self.v2))
+                .wrapping_add(rol12(*self.v3))
+                .wrapping_add(rol18(*self.v4));
 
             result = merge_round(result, *self.v1);
             result = merge_round(result, *self.v2);
             result = merge_round(result, *self.v3);
             result = merge_round(result, *self.v4);
         } else {
-            result = Wrapping::add(*self.v3, PRIME_5);
+            result = self.v3.wrapping_add(PRIME_5);
         }
 
-        result = Wrapping::add(result, (*self.total_len).into());
+        result = result.wrapping_add((*self.total_len).into());
 
         finalize(result, self.mem)
     }
@@ -115,21 +114,21 @@ impl XxHash64Impl of XxHash64Trait {
 
 #[inline]
 fn round(acc: u64, input: u64) -> u64 {
-    Wrapping::mul(rol31(Wrapping::add(acc, Wrapping::mul(input, PRIME_2))), PRIME_1)
+    rol31(acc.wrapping_add(input.wrapping_mul(PRIME_2))).wrapping_mul(PRIME_1)
 }
 
 #[inline]
 fn merge_round(mut acc: u64, val: u64) -> u64 {
     acc = acc ^ round(0, val);
-    Wrapping::add(Wrapping::mul(acc, PRIME_1), PRIME_4)
+    acc.wrapping_mul(PRIME_1).wrapping_add(PRIME_4)
 }
 
 #[inline]
 fn avalanche(mut input: u64) -> u64 {
     input = input ^ BitShift::shr(input, 33);
-    input = Wrapping::mul(input, PRIME_2);
+    input = input.wrapping_mul(PRIME_2);
     input = input ^ BitShift::shr(input, 29);
-    input = Wrapping::mul(input, PRIME_3);
+    input = input.wrapping_mul(PRIME_3);
     input = input ^ BitShift::shr(input, 32);
     input
 }
@@ -143,12 +142,12 @@ fn finalize(mut input: u64, data: @ByteArray) -> u64 {
         }
 
         input = input ^ round(0, reader.read_u64_le().unwrap());
-        input = Wrapping::add(Wrapping::mul(rol27(input), PRIME_1), PRIME_4);
+        input = rol27(input).wrapping_mul(PRIME_1).wrapping_add(PRIME_4);
     };
 
     if reader.len() >= 4 {
-        input = input ^ Wrapping::mul(reader.read_u32_le().unwrap().into(), PRIME_1);
-        input = Wrapping::add(Wrapping::mul(rol23(input), PRIME_2), PRIME_3);
+        input = input ^ reader.read_u32_le().unwrap().into().wrapping_mul(PRIME_1);
+        input = rol23(input).wrapping_mul(PRIME_2).wrapping_add(PRIME_3);
     }
 
     loop {
@@ -156,8 +155,8 @@ fn finalize(mut input: u64, data: @ByteArray) -> u64 {
             break;
         }
 
-        input = input ^ Wrapping::mul(reader.read_u8().unwrap().into(), PRIME_5);
-        input = Wrapping::mul(rol11(input), PRIME_1);
+        input = input ^ reader.read_u8().unwrap().into().wrapping_mul(PRIME_5);
+        input = rol11(input).wrapping_mul(PRIME_1);
     };
 
     avalanche(input)
