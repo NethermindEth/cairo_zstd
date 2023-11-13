@@ -149,3 +149,22 @@ impl ByteArrayExtendSliceImpl of ByteArraySliceExtendTrait {
         };
     }
 }
+
+#[generate_trait]
+impl ByteArrayPushResizeImpl of ByteArrayPushResizeTrait {
+    fn push_resize(ref self: ByteArray, new_len: usize, input: u8) {
+        assert(new_len < self.len(), 'invalid push_resize len');
+
+        let mut i: usize = 0;
+        let len = new_len - self.len();
+        loop {
+            if i >= len {
+                break;
+            }
+
+            self.append_byte(input);
+
+            i += 1;
+        }
+    }
+}
