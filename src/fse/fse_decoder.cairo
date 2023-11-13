@@ -43,7 +43,7 @@ impl FSETableDefault of Default<FSETable> {
 enum FSETableError {
     AccLogIsZero,
     AccLogTooBig: (u8, u8),
-    ProbabilityCounterMismatch: (u32, u32, Felt252Vec<i32>),
+    ProbabilityCounterMismatch: (u32, u32),
     TooManySymbols: (usize,),
     GetBitsError: GetBitsError,
 }
@@ -366,9 +366,7 @@ impl FSETableImpl of FSETableTrait {
 
         if probability_counter != probablility_sum {
             return Result::Err(
-                FSETableError::ProbabilityCounterMismatch(
-                    (probability_counter, probablility_sum, self.symbol_probabilities.clone())
-                )
+                FSETableError::ProbabilityCounterMismatch((probability_counter, probablility_sum))
             );
         }
         if self.symbol_probabilities.len() > 256 {
