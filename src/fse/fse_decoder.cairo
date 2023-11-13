@@ -10,14 +10,7 @@ use cairo_zstd::utils::math::{
 use cairo_zstd::utils::vec::{Concat, SpanIntoVec, Clear, Felt252VecClear, Reserve, Resize};
 use cairo_zstd::utils::byte_array::ByteArraySlice;
 
-impl NullableFelt252DictEntryCopyImpl of Copy<Felt252Dict<Nullable<Entry>>>;
-impl NullableVecEntryCopyImpl of Copy<NullableVec<Entry>>;
-impl NullableFelt252DictI32CopyImpl of Copy<Felt252Dict<Nullable<i32>>>;
-impl NullableVecI32CopyImpl of Copy<NullableVec<i32>>;
-impl Felt252DictU32CopyImpl of Copy<Felt252Dict<u32>>;
-impl Felt252VecU32CopyImpl of Copy<Felt252Vec<u32>>;
-
-#[derive(Copy, Destruct)]
+#[derive(Destruct)]
 struct FSETable {
     decode: NullableVec<Entry>,
     accuracy_log: u8,
@@ -43,7 +36,6 @@ enum FSETableError {
 #[derive(Destruct)]
 struct FSEDecoder {
     state: Entry,
-    table: FSETable,
 }
 
 #[derive(Copy, Drop)]
@@ -75,7 +67,6 @@ impl FSEDecoderImpl of FSEDecoderTrait {
                 Option::Some(val) => val,
                 Option::None => Entry { base_line: 0, num_bits: 0, symbol: 0, },
             },
-            table,
         }
     }
 
@@ -84,28 +75,28 @@ impl FSEDecoderImpl of FSEDecoderTrait {
     }
 
     fn init_state(
-        ref self: FSEDecoder, ref bits: BitReaderReversed
+        ref self: FSEDecoder, ref table: FSETable, ref bits: BitReaderReversed
     ) -> Result<(), FSEDecoderError> {
-        if self.table.accuracy_log == 0 {
+        if table.accuracy_log == 0 {
             return Result::Err(FSEDecoderError::TableIsUninitialized);
         }
 
-        let reading = bits.get_bits(self.table.accuracy_log);
+        let reading = bits.get_bits(table.accuracy_log);
         let reading: usize = reading.unwrap().try_into().unwrap();
 
-        self.state = self.table.decode.at(reading);
+        self.state = table.decode.at(reading);
 
         Result::Ok(())
     }
 
     fn update_state(
-        ref self: FSEDecoder, ref bits: BitReaderReversed,
+        ref self: FSEDecoder, ref table: FSETable, ref bits: BitReaderReversed,
     ) -> Result<(), FSEDecoderError> {
         let num_bits = self.state.num_bits;
         let add = bits.get_bits(num_bits).unwrap();
         let base_line = self.state.base_line;
         let new_state: usize = base_line.into() + add.try_into().unwrap();
-        self.state = self.table.decode.at(new_state);
+        self.state = table.decode.at(new_state);
 
         Result::Ok(())
     }
