@@ -169,7 +169,7 @@ impl FSETableImpl of FSETableTrait {
         let mut i: u32 = 0;
         let len = probs.len();
         loop {
-            if i == len {
+            if i >= len {
                 break;
             }
 
@@ -192,7 +192,7 @@ impl FSETableImpl of FSETableTrait {
         let len = probs.len();
 
         loop {
-            if i == len {
+            if i >= len {
                 break;
             }
 
@@ -201,7 +201,7 @@ impl FSETableImpl of FSETableTrait {
 
             let mut j = 0;
             loop {
-                if j == prob {
+                if j >= prob {
                     break;
                 }
 
@@ -230,7 +230,7 @@ impl FSETableImpl of FSETableTrait {
 
         let mut i = 0;
         loop {
-            if i == negative_idx {
+            if i >= negative_idx {
                 break;
             }
 
