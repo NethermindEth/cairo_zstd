@@ -147,7 +147,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
     }
 
     fn build_decoder(
-        ref self: HuffmanTable, source: ByteArraySlice
+        ref self: HuffmanTable, source: @ByteArraySlice
     ) -> Result<u32, HuffmanTableError> {
         self.decode.clear();
 
@@ -157,7 +157,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
     }
 
     fn read_weights(
-        ref self: HuffmanTable, source: ByteArraySlice
+        ref self: HuffmanTable, source: @ByteArraySlice
     ) -> Result<u32, HuffmanTableError> {
         if source.len() == 0 {
             return Result::Err(HuffmanTableError::SourceIsEmpty);
@@ -166,7 +166,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
         let mut bits_read = 8;
 
         if header >= 0 && header <= 127 {
-            let fse_stream = source.slice(1, source.len());
+            let fse_stream = @source.slice(1, source.len());
 
             if header.into() > fse_stream.len() {
                 return Result::Err(

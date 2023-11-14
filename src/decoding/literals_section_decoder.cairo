@@ -45,15 +45,18 @@ enum DecompressLiteralsError {
 }
 
 fn decode_literals(
-    section: LiteralsSection, ref scratch: HuffmanScratch, source: ByteArray, ref target: ByteArray,
+    section: @LiteralsSection,
+    ref scratch: HuffmanScratch,
+    source: @ByteArraySlice,
+    ref target: ByteArray,
 ) -> Result<u32, DecompressLiteralsError> {
     match section.ls_type {
         LiteralsSectionType::Raw => {
-            target.extend_slice(ByteArraySliceTrait::new(@source, 0, section.regenerated_size));
-            Result::Ok(section.regenerated_size)
+            target.extend_slice(source.slice(0, *section.regenerated_size));
+            Result::Ok(*section.regenerated_size)
         },
         LiteralsSectionType::RLE => {
-            target.push_resize(target.len() + section.regenerated_size, source[0]);
+            target.push_resize(target.len() + *section.regenerated_size, source[0]);
             Result::Ok(1)
         },
         LiteralsSectionType::Compressed => {
@@ -68,14 +71,16 @@ fn decode_literals(
 }
 
 fn decompress_literals(
-    section: LiteralsSection, ref scratch: HuffmanScratch, source: ByteArray, ref target: ByteArray,
+    section: @LiteralsSection,
+    ref scratch: HuffmanScratch,
+    source: @ByteArraySlice,
+    ref target: ByteArray,
 ) -> Result<u32, DecompressLiteralsError> {
-    let compressed_size = section
-        .compressed_size
+    let compressed_size = (*section.compressed_size)
         .ok_or(DecompressLiteralsError::MissingCompressedSize)?;
-    let num_streams = section.num_streams.ok_or(DecompressLiteralsError::MissingNumStreams)?;
+    let num_streams = (*section.num_streams).ok_or(DecompressLiteralsError::MissingNumStreams)?;
 
-    let source = ByteArraySliceTrait::new(@source, 0, compressed_size);
+    let source = @source.slice(0, compressed_size);
     let mut bytes_read = 0;
 
     match section.ls_type {
@@ -114,10 +119,10 @@ fn decompress_literals(
             );
         }
 
-        let stream1 = source.slice(0, jump1);
-        let stream2 = source.slice(jump1, jump2);
-        let stream3 = source.slice(jump2, jump3);
-        let stream4 = source.slice(jump3, source.len());
+        let stream1 = @source.slice(0, jump1);
+        let stream2 = @source.slice(jump1, jump2);
+        let stream3 = @source.slice(jump2, jump3);
+        let stream4 = @source.slice(jump3, source.len());
 
         _process_stream(ref scratch, ref target, stream1)?;
         _process_stream(ref scratch, ref target, stream2)?;
@@ -179,10 +184,10 @@ fn decompress_literals(
         bytes_read += source.len();
     }
 
-    if target.len() != section.regenerated_size {
+    if target.len() != *section.regenerated_size {
         return Result::Err(
             DecompressLiteralsError::DecodedLiteralCountMismatch(
-                (target.len(), section.regenerated_size)
+                (target.len(), *section.regenerated_size)
             )
         );
     }
@@ -191,10 +196,10 @@ fn decompress_literals(
 }
 
 fn _process_stream(
-    ref scratch: HuffmanScratch, ref target: ByteArray, stream: ByteArraySlice
+    ref scratch: HuffmanScratch, ref target: ByteArray, stream: @ByteArraySlice
 ) -> Result<(), DecompressLiteralsError> {
     let mut decoder = HuffmanDecoderTrait::new();
-    let mut br = BitReaderReversedTrait::new(@stream);
+    let mut br = BitReaderReversedTrait::new(stream);
     let mut skipped_bits = 0;
 
     let result = loop {

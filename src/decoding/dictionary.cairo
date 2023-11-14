@@ -49,7 +49,7 @@ impl DictionaryImpl of DictionaryTrait {
         let dict_id = raw.word_u32_le(4).expect('optimized away');
         new_dict.id = dict_id;
 
-        let raw_tables = ByteArraySliceTrait::new(raw, 8, raw.len());
+        let raw_tables = @ByteArraySliceTrait::new(raw, 8, raw.len());
 
         let huf_size = match new_dict.huf.table.build_decoder(raw_tables) {
             Result::Ok(val) => val,
@@ -57,19 +57,19 @@ impl DictionaryImpl of DictionaryTrait {
                 return Result::Err(DictionaryDecodeError::HuffmanTableError(err));
             },
         };
-        let raw_tables = raw_tables.slice(huf_size, raw_tables.len());
+        let raw_tables = @raw_tables.slice(huf_size, raw_tables.len());
 
         let of_size = match new_dict.fse.offsets.build_decoder(raw_tables, OF_MAX_LOG,) {
             Result::Ok(val) => val,
             Result::Err(err) => { return Result::Err(DictionaryDecodeError::FSETableError(err)); },
         };
-        let raw_tables = raw_tables.slice(of_size, raw_tables.len());
+        let raw_tables = @raw_tables.slice(of_size, raw_tables.len());
 
         let ml_size = match new_dict.fse.match_lengths.build_decoder(raw_tables, ML_MAX_LOG,) {
             Result::Ok(val) => val,
             Result::Err(err) => { return Result::Err(DictionaryDecodeError::FSETableError(err)); },
         };
-        let raw_tables = raw_tables.slice(ml_size, raw_tables.len());
+        let raw_tables = @raw_tables.slice(ml_size, raw_tables.len());
 
         let ll_size = match new_dict.fse.literal_lengths.build_decoder(raw_tables, LL_MAX_LOG,) {
             Result::Ok(val) => val,
