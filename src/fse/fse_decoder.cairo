@@ -8,13 +8,14 @@ use cairo_zstd::utils::math::{
     I32Felt252DictValue, HighestBitSet, HighestBitSetImpl, U64TryIntoI32, I32TryIntoU32
 };
 use cairo_zstd::utils::vec::{Concat, SpanIntoVec, Clear, Felt252VecClear, Reserve, Resize};
+use cairo_zstd::utils::array::{ArrayPushResizeTrait, ArrayAppendSpanTrait};
 use cairo_zstd::utils::byte_array::ByteArraySlice;
 
 #[derive(Destruct)]
 struct FSETable {
     decode: NullableVec<Entry>,
     accuracy_log: u8,
-    symbol_probabilities: NullableVec<i32>,
+    symbol_probabilities: Array<i32>,
     symbol_counter: Felt252Vec<u32>,
 }
 
@@ -106,7 +107,7 @@ impl FSEDecoderImpl of FSEDecoderTrait {
 impl FSETableImpl of FSETableTrait {
     fn new() -> FSETable {
         FSETable {
-            symbol_probabilities: VecTrait::<NullableVec, i32>::new(),
+            symbol_probabilities: ArrayTrait::new(),
             symbol_counter: VecTrait::<Felt252Vec, u32>::new(),
             decode: VecTrait::<NullableVec, Entry>::new(),
             accuracy_log: 0,
@@ -116,14 +117,14 @@ impl FSETableImpl of FSETableTrait {
     fn reinit_from(ref self: FSETable, ref other: FSETable) {
         self.reset();
         self.symbol_counter.concat(ref other.symbol_counter);
-        self.symbol_probabilities.concat(ref other.symbol_probabilities);
+        self.symbol_probabilities.append_span(other.symbol_probabilities.span());
         self.decode.concat(ref other.decode);
         self.accuracy_log = other.accuracy_log;
     }
 
     fn reset(ref self: FSETable) {
         self.symbol_counter = VecTrait::<Felt252Vec, u32>::new();
-        self.symbol_probabilities = VecTrait::<NullableVec, i32>::new();
+        self.symbol_probabilities = ArrayTrait::new();
         self.decode = VecTrait::<NullableVec, Entry>::new();
         self.accuracy_log = 0;
     }
@@ -145,7 +146,8 @@ impl FSETableImpl of FSETableTrait {
         if acc_log == 0 {
             return Result::Err(FSETableError::AccLogIsZero);
         }
-        self.symbol_probabilities = probs.into();
+        self.symbol_probabilities = ArrayTrait::new();
+        self.symbol_probabilities.append_span(probs);
         self.accuracy_log = acc_log;
         self.build_decoding_table();
         Result::Ok(())
@@ -162,8 +164,10 @@ impl FSETableImpl of FSETableTrait {
 
         let mut negative_idx = table_size;
 
+        let probs = self.symbol_probabilities.span();
+
         let mut i: u32 = 0;
-        let len = self.symbol_probabilities.len();
+        let len = probs.len();
         loop {
             if i == len {
                 break;
@@ -171,7 +175,7 @@ impl FSETableImpl of FSETableTrait {
 
             let symbol: u8 = i.try_into().unwrap();
 
-            if self.symbol_probabilities[i] == -1 {
+            if *probs[i] == -1 {
                 negative_idx -= 1;
                 let mut entry: Entry = self.decode[negative_idx];
                 entry.symbol = symbol;
@@ -185,18 +189,16 @@ impl FSETableImpl of FSETableTrait {
 
         let mut position = 0;
         let mut i: u32 = 0;
-        let len = self.symbol_probabilities.len();
+        let len = probs.len();
+
         loop {
             if i == len {
                 break;
             }
 
             let symbol: u8 = i.try_into().unwrap();
-            if self.symbol_probabilities[i] <= 0 {
-                continue;
-            }
+            let prob = *probs[i];
 
-            let prob = self.symbol_probabilities[i];
             let mut j = 0;
             loop {
                 if j == prob {
@@ -234,7 +236,7 @@ impl FSETableImpl of FSETableTrait {
 
             let mut entry: Entry = self.decode[i];
             let symbol = entry.symbol;
-            let prob = self.symbol_probabilities[symbol.into()];
+            let prob = *probs[symbol.into()];
 
             let symbol_count = self.symbol_counter[symbol.into()];
             let (bl, nb) = calc_baseline_and_numbits(
@@ -256,7 +258,7 @@ impl FSETableImpl of FSETableTrait {
     fn read_probabilities(
         ref self: FSETable, source: @ByteArraySlice, max_log: u8
     ) -> Result<usize, FSETableError> {
-        self.symbol_probabilities.clear();
+        self.symbol_probabilities = ArrayTrait::new();
 
         let mut br = BitReaderTrait::new(source);
 
@@ -306,9 +308,9 @@ impl FSETableImpl of FSETableTrait {
                 unchecked_value
             };
 
-            let prob = value.try_into().unwrap() - 1;
+            let prob: i32 = value.try_into().unwrap() - 1;
 
-            self.symbol_probabilities.push(prob);
+            self.symbol_probabilities.append(prob);
             if prob != 0 {
                 if prob > 0 {
                     probability_counter += prob.try_into().unwrap();
@@ -326,7 +328,7 @@ impl FSETableImpl of FSETableTrait {
 
                     self
                         .symbol_probabilities
-                        .resize(
+                        .push_resize(
                             self.symbol_probabilities.len()
                                 + skip_amount.unwrap().try_into().unwrap(),
                             0
