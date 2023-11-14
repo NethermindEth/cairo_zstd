@@ -129,7 +129,7 @@ impl FSETableImpl of FSETableTrait {
     }
 
     fn build_decoder(
-        ref self: FSETable, source: ByteArraySlice, max_log: u8
+        ref self: FSETable, source: @ByteArraySlice, max_log: u8
     ) -> Result<usize, FSETableError> {
         self.accuracy_log = 0;
 
@@ -254,11 +254,11 @@ impl FSETableImpl of FSETableTrait {
     }
 
     fn read_probabilities(
-        ref self: FSETable, source: ByteArraySlice, max_log: u8
+        ref self: FSETable, source: @ByteArraySlice, max_log: u8
     ) -> Result<usize, FSETableError> {
         self.symbol_probabilities.clear();
 
-        let mut br = BitReaderTrait::new(@source);
+        let mut br = BitReaderTrait::new(source);
 
         let acc_idx = br.get_bits(4);
         if acc_idx.is_err() {
