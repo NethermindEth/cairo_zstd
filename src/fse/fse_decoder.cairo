@@ -382,7 +382,7 @@ fn calc_baseline_and_numbits(
     let num_state_slices = if mask == num_states_symbol {
         num_states_symbol
     } else {
-        mask
+        mask * 2
     };
 
     let num_double_width_state_slices = num_state_slices - num_states_symbol;
