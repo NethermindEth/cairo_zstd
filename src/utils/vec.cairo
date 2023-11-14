@@ -12,7 +12,7 @@ impl Felt252VecConcatImpl<
         let other_len = other.len();
 
         loop {
-            if i == other_len {
+            if i >= other_len {
                 break;
             }
 
@@ -31,7 +31,7 @@ impl NullableVecConcatImpl<
         let other_len = other.len();
 
         loop {
-            if i == other_len {
+            if i >= other_len {
                 break;
             }
 
@@ -59,7 +59,7 @@ impl Felt252VecResize<
 
         if new_len > len {
             loop {
-                if len == new_len {
+                if len >= new_len {
                     break;
                 }
 
@@ -79,7 +79,7 @@ impl NullableVecResize<T, +Drop<T>, +Copy<T>> of Resize<NullableVec<T>, T> {
 
         if new_len > len {
             loop {
-                if len == new_len {
+                if len >= new_len {
                     break;
                 }
 
@@ -138,7 +138,7 @@ impl SpanIntoVec<
         let mut vec = VecTrait::<V, T>::new();
 
         loop {
-            if i == len {
+            if i >= len {
                 break;
             }
 

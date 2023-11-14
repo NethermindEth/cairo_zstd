@@ -293,8 +293,9 @@ impl HuffmanTableImpl of HuffmanTableTrait {
             }
 
             let mut idx: usize = 0;
+            let len: usize = num_weights.into();
             loop {
-                if idx == num_weights.into() {
+                if idx >= len {
                     break;
                 }
 
@@ -325,7 +326,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
         let mut i: usize = 0;
         let len = self.weights.len();
         let result = loop {
-            if i == len {
+            if i >= len {
                 break Result::Ok(());
             }
 
@@ -364,7 +365,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
         let mut symbol: usize = 0;
         let len = self.weights.len();
         loop {
-            if symbol == len {
+            if symbol >= len {
                 break;
             }
 
@@ -390,7 +391,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
         let mut i: usize = 0;
         let len = self.bits.len();
         loop {
-            if i == len {
+            if i >= len {
                 break;
             }
 
@@ -432,7 +433,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
         let mut symbol: usize = 0;
         let bits_len = self.bits.len();
         loop {
-            if symbol == bits_len {
+            if symbol >= bits_len {
                 break;
             }
 
@@ -449,7 +450,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
 
                 let mut idx: usize = 0;
                 loop {
-                    if idx == len {
+                    if idx >= len {
                         break;
                     }
 
