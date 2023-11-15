@@ -227,20 +227,15 @@ impl ByteArraySliceReaderImpl of ByteArraySliceReaderTrait {
 
 #[generate_trait]
 impl ByteArrayExtendSliceImpl of ByteArraySliceExtendTrait {
-    fn extend_slice(ref self: ByteArray, input: ByteArraySlice) {
+    fn extend_slice(ref self: ByteArray, input: @ByteArraySlice) {
+        // also keeping this simple for now
         let mut i: usize = 0;
         loop {
-            let len = min(input.len() - i * 31, BYTES_IN_BYTES31);
-
-            if len == 0 {
+            if i >= input.len() {
                 break;
             }
 
-            if len == BYTES_IN_BYTES31 {
-                self.append_word((*input.data.data.at(i)).into(), len);
-            } else {
-                self.append_word(*input.data.pending_word, len)
-            }
+            self.append_byte(input[i]);
 
             i += 1;
         };
