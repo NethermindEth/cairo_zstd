@@ -47,7 +47,7 @@ impl RingBufferImpl of RingBufferTrait {
         self.elements.append(data);
     }
 
-    fn extend_slice(ref self: RingBuffer, data: ByteArraySlice) {
+    fn extend_slice(ref self: RingBuffer, data: @ByteArraySlice) {
         self.elements.extend_slice(data);
     }
 
