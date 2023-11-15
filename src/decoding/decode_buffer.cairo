@@ -70,7 +70,7 @@ impl DecodeBufferImpl of DecodeBufferTrait {
                 }
 
                 if bytes_from_dict < match_length {
-                    let dict_slice = self
+                    let dict_slice = @self
                         .dict_content
                         .slice(self.dict_content.len() - bytes_from_dict, self.dict_content.len());
                     self.buffer.extend_slice(dict_slice);
@@ -80,7 +80,7 @@ impl DecodeBufferImpl of DecodeBufferTrait {
                 } else {
                     let low = self.dict_content.len() - bytes_from_dict;
                     let high = low + match_length;
-                    let dict_slice = self.dict_content.slice(low, high);
+                    let dict_slice = @self.dict_content.slice(low, high);
                     self.buffer.extend_slice(dict_slice);
                 }
             } else {
@@ -106,7 +106,7 @@ impl DecodeBufferImpl of DecodeBufferTrait {
                     self
                         .buffer
                         .extend_slice(
-                            ByteArraySliceTrait::new(
+                            @ByteArraySliceTrait::new(
                                 @self.buffer.elements, start_idx, start_idx + chunksize
                             )
                         );
@@ -117,7 +117,7 @@ impl DecodeBufferImpl of DecodeBufferTrait {
                 self
                     .buffer
                     .extend_slice(
-                        ByteArraySliceTrait::new(@self.buffer.elements, start_idx, end_idx)
+                        @ByteArraySliceTrait::new(@self.buffer.elements, start_idx, end_idx)
                     );
             }
 
@@ -150,7 +150,7 @@ impl DecodeBufferImpl of DecodeBufferTrait {
     }
 
     fn drain(ref self: DecodeBuffer) -> ByteArray {
-        let slice = self.buffer.as_slice();
+        let slice = @self.buffer.as_slice();
         let mut ba: ByteArray = Default::default(); // improve this
         ba.extend_slice(slice);
 
@@ -170,7 +170,7 @@ impl DecodeBufferImpl of DecodeBufferTrait {
         let slice = self.buffer.as_slice();
         let n = min(slice.len(), amount);
 
-        let subslice = slice.slice(0, n);
+        let subslice = @slice.slice(0, n);
 
         ba.extend_slice(subslice);
         self.hash.update(@ba);
