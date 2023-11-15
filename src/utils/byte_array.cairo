@@ -55,6 +55,7 @@ trait ByteArrayTraitExtRead<T> {
     fn word_u64_le(self: @T, offset: usize) -> Option<u64>;
     fn word_u128(self: @T, offset: usize) -> Option<u128>;
     fn word_u128_le(self: @T, offset: usize) -> Option<u128>;
+    fn reader(self: @T) -> ByteArraySliceReader;
 }
 
 impl ByteArraySliceByteArrayTraitExtReadImpl of ByteArrayTraitExtRead<ByteArraySlice> {
