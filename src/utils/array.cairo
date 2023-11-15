@@ -1,7 +1,7 @@
 #[generate_trait]
 impl ArrayPushResizeImpl<T, +Copy<T>, +Drop<T>> of ArrayPushResizeTrait<T> {
     fn push_resize(ref self: Array<T>, new_len: usize, input: T) {
-        assert(new_len < self.len(), 'invalid push_resize len');
+        assert(new_len >= self.len(), 'invalid push_resize len');
 
         let mut i: usize = 0;
         let len = new_len - self.len();
