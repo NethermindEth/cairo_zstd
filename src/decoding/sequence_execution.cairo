@@ -43,7 +43,7 @@ fn execute_sequences(ref scratch: DecoderScratch) -> Result<(), ExecuteSequences
         let (actual_offset, new_scratch) = do_offset_history(
             seq.offset, seq.literals_length, scratch.offset_hist
         );
-        let (actual_offset, new_scratch) = (0_u32, (0_u32, 0_u32, 0_u32));
+
         if actual_offset == 0 {
             break Result::Err(ExecuteSequencesError::ZeroOffset);
         }
