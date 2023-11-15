@@ -260,3 +260,22 @@ impl ByteArrayPushResizeImpl of ByteArrayPushResizeTrait {
         }
     }
 }
+
+impl U8SpanIntoByteArray of Into<Span<u8>, ByteArray> {
+    fn into(self: Span<u8>) -> ByteArray {
+        let mut ba: ByteArray = Default::default();
+
+        let mut i: usize = 0;
+        loop {
+            if i >= self.len() {
+                break;
+            }
+
+            ba.append_byte(*self.at(i));
+
+            i += 1;
+        };
+
+        ba
+    }
+}
