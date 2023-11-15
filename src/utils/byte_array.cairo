@@ -17,7 +17,8 @@ impl ByteArraySliceImpl of ByteArraySliceTrait {
     fn new(data: @ByteArray, from: usize, end: usize) -> ByteArraySlice {
         let len = end - from;
 
-        assert(data.len() - from <= len, 'Slice larger than array');
+        assert(data.len() >= from, 'Slice start outside array');
+        assert(data.len() - from >= len, 'Slice larger than array');
 
         ByteArraySlice { data, from, len }
     }
@@ -153,7 +154,7 @@ impl ByteArrayExtendSliceImpl of ByteArraySliceExtendTrait {
 #[generate_trait]
 impl ByteArrayPushResizeImpl of ByteArrayPushResizeTrait {
     fn push_resize(ref self: ByteArray, new_len: usize, input: u8) {
-        assert(new_len < self.len(), 'invalid push_resize len');
+        assert(new_len >= self.len(), 'invalid push_resize len');
 
         let mut i: usize = 0;
         let len = new_len - self.len();
