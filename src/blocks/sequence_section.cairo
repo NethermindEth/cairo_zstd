@@ -8,7 +8,7 @@ struct SequencesHeader {
     modes: Option<u8>
 }
 
-#[derive(Clone, Copy)]
+#[derive(Drop, Clone, Copy)]
 struct Sequence {
     ll: u32,
     ml: u32,
