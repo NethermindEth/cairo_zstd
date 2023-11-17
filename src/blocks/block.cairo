@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Drop, Debug, Clone, Copy, PartialEq, Eq)]
 enum BlockType {
     Raw,
     RLE,
@@ -6,6 +6,7 @@ enum BlockType {
     Reserved,
 }
 
+#[derive(Drop)]
 struct BlockHeader {
     last_block: bool,
     block_type: BlockType,
