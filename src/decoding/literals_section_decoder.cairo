@@ -52,7 +52,7 @@ fn decode_literals(
 ) -> Result<u32, DecompressLiteralsError> {
     match section.ls_type {
         LiteralsSectionType::Raw => {
-            target.extend_slice(source.slice(0, *section.regenerated_size));
+            target.extend_slice(@source.slice(0, *section.regenerated_size));
             Result::Ok(*section.regenerated_size)
         },
         LiteralsSectionType::RLE => {
