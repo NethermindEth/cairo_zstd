@@ -15,9 +15,9 @@ struct Sequence {
     offset: u32,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Drop, Copy)]
 struct CompressionModes {
-    modes: u8
+    modes: u8,
 }
 
 #[derive(Drop)]
