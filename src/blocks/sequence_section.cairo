@@ -30,42 +30,30 @@ enum ModeType {
 
 #[generate_trait]
 impl CompressionModesImpl of CompressionModesTrait {
-    fn decode_mode(m: u8) -> Result<ModeType, felt252> {
+    fn decode_mode(m: u8) -> ModeType {
+        assert(m >= 0 && m <= 3, 'Invalid compression mode type');
+
         if m == 0 {
-            Result::Ok(ModeType::Predefined)
+            ModeType::Predefined
         } else if m == 1 {
-            Result::Ok(ModeType::RLE)
+            ModeType::RLE
         } else if m == 2 {
-            Result::Ok(ModeType::FSECompressed)
-        } else if m == 3 {
-            Result::Ok(ModeType::Repeat)
+            ModeType::FSECompressed
         } else {
-            Result::Err('This can never happen')
+            ModeType::Repeat
         }
     }
 
     fn ll_mode(self: @CompressionModes) -> ModeType {
-        let mode_byte = BitShift::shr(*self.modes, 6);
-        match CompressionModesTrait::decode_mode(mode_byte) {
-            Result::Ok(mode) => mode,
-            Result::Err => panic_with_felt252('error')
-        }
+        CompressionModesTrait::decode_mode(BitShift::shr(*self.modes, 6))
     }
 
     fn of_mode(self: @CompressionModes) -> ModeType {
-        let mode_byte = BitShift::shr(*self.modes, 4) & 0x3;
-        match CompressionModesTrait::decode_mode(mode_byte) {
-            Result::Ok(mode) => mode,
-            Result::Err => panic_with_felt252('error')
-        }
+        CompressionModesTrait::decode_mode(BitShift::shr(*self.modes, 4) & 0x3)
     }
 
     fn ml_mode(self: @CompressionModes) -> ModeType {
-        let mode_byte = BitShift::shr(*self.modes, 2) & 0x3;
-        match CompressionModesTrait::decode_mode(mode_byte) {
-            Result::Ok(mode) => mode,
-            Result::Err => panic_with_felt252('error')
-        }
+        CompressionModesTrait::decode_mode(BitShift::shr(*self.modes, 2) & 0x3)
     }
 }
 
