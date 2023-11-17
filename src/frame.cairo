@@ -18,7 +18,7 @@ struct FrameHeader {
     frame_content_size: u64,
 }
 
-#[derive(Drop)]
+#[derive(Copy, Drop)]
 struct FrameDescriptor {
     descriptor: u8,
 }
