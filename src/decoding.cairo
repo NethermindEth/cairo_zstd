@@ -6,3 +6,4 @@ mod dictionary;
 mod scratch;
 mod sequence_execution;
 mod literals_section_decoder;
+mod sequence_section_decoder;
