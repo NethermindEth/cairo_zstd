@@ -7,27 +7,12 @@ use cairo_zstd::decoding::scratch::HuffmanScratch;
 use cairo_zstd::huff0::huff0_decoder::{
     HuffmanDecoderTrait, HuffmanTableTrait, HuffmanDecoderError, HuffmanTableError
 };
+use cairo_zstd::blocks::literals_section::{LiteralsSection, LiteralsSectionType};
 use cairo_zstd::utils::types::isize;
 use cairo_zstd::utils::byte_array::{
     ByteArraySlice, ByteArraySliceTrait, ByteArraySliceExtendTrait, ByteArrayPushResizeTrait
 };
 use cairo_zstd::utils::math::U8TryIntoI32;
-
-#[derive(Drop)]
-struct LiteralsSection {
-    regenerated_size: u32,
-    compressed_size: Option<u32>,
-    num_streams: Option<u8>,
-    ls_type: LiteralsSectionType,
-}
-
-#[derive(Copy, Drop)]
-enum LiteralsSectionType {
-    Raw,
-    RLE,
-    Compressed,
-    Treeless,
-}
 
 #[derive(Drop)]
 enum DecompressLiteralsError {

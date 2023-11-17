@@ -4,14 +4,8 @@ use cairo_zstd::decoding::decode_buffer::{DecodeBuffer, DecodeBufferTrait};
 use cairo_zstd::decoding::dictionary::{Dictionary, DictionaryTrait};
 use cairo_zstd::fse::fse_decoder::{FSETable, FSETableTrait};
 use cairo_zstd::huff0::huff0_decoder::{HuffmanTable, HuffmanTableTrait};
+use cairo_zstd::blocks::sequence_section::Sequence;
 use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait};
-
-#[derive(Clone, Copy, Drop)]
-struct Sequence {
-    literals_length: u32,
-    match_length: u32,
-    offset: u32,
-}
 
 #[derive(Destruct)]
 struct DecoderScratch {
