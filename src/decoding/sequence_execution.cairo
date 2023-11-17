@@ -34,7 +34,7 @@ fn execute_sequences(ref scratch: DecoderScratch) -> Result<(), ExecuteSequences
                     )
                 );
             }
-            let literals = scratch.literals_buffer.slice(literals_copy_counter, high);
+            let literals = @scratch.literals_buffer.slice(literals_copy_counter, high);
             literals_copy_counter += seq.literals_length.into();
 
             scratch.buffer.push(literals);
@@ -43,7 +43,7 @@ fn execute_sequences(ref scratch: DecoderScratch) -> Result<(), ExecuteSequences
         let (actual_offset, new_scratch) = do_offset_history(
             seq.offset, seq.literals_length, scratch.offset_hist
         );
-        let (actual_offset, new_scratch) = (0_u32, (0_u32, 0_u32, 0_u32));
+
         if actual_offset == 0 {
             break Result::Err(ExecuteSequencesError::ZeroOffset);
         }
@@ -70,7 +70,7 @@ fn execute_sequences(ref scratch: DecoderScratch) -> Result<(), ExecuteSequences
     }
 
     if literals_copy_counter < scratch.literals_buffer.len() {
-        let rest_literals = scratch
+        let rest_literals = @scratch
             .literals_buffer
             .slice(literals_copy_counter, scratch.literals_buffer.len());
         scratch.buffer.push(rest_literals);
