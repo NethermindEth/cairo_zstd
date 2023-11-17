@@ -10,9 +10,9 @@ struct SequencesHeader {
 
 #[derive(Drop, Clone, Copy)]
 struct Sequence {
-    ll: u32,
-    ml: u32,
-    ot: u32,
+    literals_length: u32,
+    match_length: u32,
+    offset: u32,
 }
 
 #[derive(Clone, Copy)]
