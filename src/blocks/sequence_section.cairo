@@ -66,7 +66,6 @@ impl SequencesHeaderDefault of Default<SequencesHeader> {
 #[derive(Drop)]
 enum SequencesHeaderParseError {
     NotEnoughBytes: (u8, usize),
-    SourceIsEmpty,
 }
 
 #[generate_trait]
@@ -80,40 +79,37 @@ impl SequencesHeaderImpl of SequencesHeaderTrait {
     ) -> Result<u8, SequencesHeaderParseError> {
         let mut bytes_read = 0;
         if source.len() == 0 {
-            return Result::Err(SequencesHeaderParseError::SourceIsEmpty);
+            return Result::Err(SequencesHeaderParseError::NotEnoughBytes((1, 0)));
         }
 
-        let header = source[0];
-
-        if header == 0 {
-            self.num_sequences = 0
-        } else if header >= 1 && header <= 127 {
+        if source[0] == 0 {
+            self.num_sequences = 0;
+            return Result::Ok(1);
+        } else if source[0] >= 1 && source[0] <= 127 {
             if source.len() < 2 {
-                return Result::Err(SequencesHeaderParseError::NotEnoughBytes((2, source.len(),)));
+                return Result::Err(SequencesHeaderParseError::NotEnoughBytes((2, source.len())));
             }
             self.num_sequences = source[0].into();
             bytes_read += 1;
-            @source.slice(1, source.len());
-        } else if header >= 128 && header <= 254 {
+        } else if source[0] >= 128 && source[0] <= 254 {
             if source.len() < 3 {
-                return Result::Err(SequencesHeaderParseError::NotEnoughBytes((3, source.len(),)));
+                return Result::Err(SequencesHeaderParseError::NotEnoughBytes((3, source.len())));
             }
-            self.num_sequences = BitShift::shl((source[0] - 128), 8).into() + source[1].into();
+            self.num_sequences = BitShift::shl(source[0].into() - 128_u32, 8) + source[1].into();
             bytes_read += 2;
-            @source.slice(2, source.len());
-        } else if header == 255 {
+        } else if source[0] == 255 {
             if source.len() < 4 {
-                return Result::Err(SequencesHeaderParseError::NotEnoughBytes((4, source.len(),)));
+                return Result::Err(SequencesHeaderParseError::NotEnoughBytes((4, source.len())));
             }
-            self.num_sequences = (source[1].into()) + (BitShift::shl(source[2], 8).into()) + 0x7F00;
+            self.num_sequences = source[1].into()
+                + BitShift::shl(source[2].into(), 8_u32)
+                + 0x7F00_u32;
             bytes_read += 3;
-            @source.slice(3, source.len());
         }
 
-        let w = CompressionModes { modes: source[0] };
-        self.modes = Option::Some(w.modes);
+        self.modes = Option::Some(CompressionModes { modes: source[bytes_read.into()] });
         bytes_read += 1;
 
-        return Result::Ok(1);
+        Result::Ok(bytes_read)
     }
 }
