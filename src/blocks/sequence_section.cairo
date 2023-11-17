@@ -1,4 +1,5 @@
-use alexandria_math::{BitShift};
+use alexandria_math::BitShift;
+
 use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait};
 
 #[derive(Drop)]
