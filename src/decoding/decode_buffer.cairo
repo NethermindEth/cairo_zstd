@@ -184,5 +184,22 @@ impl DecodeBufferImpl of DecodeBufferTrait {
 
         ba
     }
+
+    fn read(ref self: DecodeBuffer, ref target: ByteArray) -> usize {
+        let amount = match self.can_drain_to_window_size() {
+            Option::Some(val) => val,
+            Option::None => 0,
+        };
+
+        target.append(@self.drain_to(amount));
+        amount
+    }
+
+    fn read_all(ref self: DecodeBuffer, ref target: ByteArray) -> usize {
+        let amount = self.buffer.len();
+
+        target.append(@self.drain_to(amount));
+        amount
+    }
 }
 

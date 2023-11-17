@@ -4,6 +4,7 @@ mod fse;
 mod huff0;
 mod utils;
 mod frame;
+mod frame_decoder;
 
 #[cfg(test)]
 mod tests;
