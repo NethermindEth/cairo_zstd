@@ -5,7 +5,7 @@ use cairo_zstd::utils::byte_array::{ByteArraySlice, ByteArraySliceTrait};
 #[derive(Drop)]
 struct SequencesHeader {
     num_sequences: u32,
-    modes: Option<u8>
+    modes: Option<CompressionModes>,
 }
 
 #[derive(Drop, Clone, Copy)]
