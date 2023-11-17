@@ -1,5 +1,8 @@
 use alexandria_math::BitShift;
-use alexandria_data_structures::byte_array_ext::{ByteArrayTraitExt, ByteArrayReaderTrait};
+
+use cairo_zstd::utils::byte_array::{
+    ByteArraySlice, ByteArraySliceTrait, ByteArraySliceReaderTrait, ByteArrayTraitExtRead
+};
 
 const MAGIC_NUM: u32 = 0xFD2F_B528;
 const MIN_WINDOW_SIZE: u64 = 1024;
@@ -146,7 +149,7 @@ enum ReadFrameHeaderError {
     SkipFrame: (u32, u32),
 }
 
-fn read_frame_header(ba: @ByteArray) -> Result<(Frame, u8), ReadFrameHeaderError> {
+fn read_frame_header(ref ba: @ByteArraySlice) -> Result<(Frame, u8), ReadFrameHeaderError> {
     let mut reader = ba.reader();
 
     let magic_num = match reader.read_u32_le() {
@@ -276,5 +279,6 @@ fn read_frame_header(ba: @ByteArray) -> Result<(Frame, u8), ReadFrameHeaderError
 
     let frame: Frame = Frame { header: frame_header, };
 
+    ba = @ba.slice(reader.reader_index, ba.len());
     Result::Ok((frame, reader.reader_index.try_into().unwrap()))
 }
