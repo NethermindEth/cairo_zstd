@@ -1,1 +1,3 @@
 target
+src/tests/decode_corpus/*
+src/tests/decode_corpus.cairo
