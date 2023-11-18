@@ -440,7 +440,7 @@ impl HuffmanTableImpl of HuffmanTableTrait {
             let bits_for_symbol = self.bits[symbol];
             if bits_for_symbol != 0 {
                 let base_idx = self.rank_indexes[bits_for_symbol.into()];
-                let len: usize = BitShift::shl(1, max_bits - bits_for_symbol).into();
+                let len: usize = BitShift::shl(1_u32, max_bits.into() - bits_for_symbol.into());
                 self
                     .rank_indexes
                     .set(
