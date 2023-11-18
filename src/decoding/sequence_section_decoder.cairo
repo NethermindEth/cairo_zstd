@@ -150,24 +150,30 @@ fn decode_sequences_with_rle(
             );
 
         if target.len() < *section.num_sequences.into() {
-            match ll_dec.update_state(ref scratch.literal_lengths, ref br) {
-                Result::Ok(val) => val,
-                Result::Err(err) => {
-                    break Result::Err(DecodeSequenceError::FSEDecoderError(err));
-                },
-            };
-            match ml_dec.update_state(ref scratch.match_lengths, ref br) {
-                Result::Ok(val) => val,
-                Result::Err(err) => {
-                    break Result::Err(DecodeSequenceError::FSEDecoderError(err));
-                },
-            };
-            match of_dec.update_state(ref scratch.offsets, ref br) {
-                Result::Ok(val) => val,
-                Result::Err(err) => {
-                    break Result::Err(DecodeSequenceError::FSEDecoderError(err));
-                },
-            };
+            if scratch.ll_rle.is_none() {
+                match ll_dec.update_state(ref scratch.literal_lengths, ref br) {
+                    Result::Ok(val) => val,
+                    Result::Err(err) => {
+                        break Result::Err(DecodeSequenceError::FSEDecoderError(err));
+                    },
+                };
+            }
+            if scratch.ml_rle.is_none() {
+                match ml_dec.update_state(ref scratch.match_lengths, ref br) {
+                    Result::Ok(val) => val,
+                    Result::Err(err) => {
+                        break Result::Err(DecodeSequenceError::FSEDecoderError(err));
+                    },
+                };
+            }
+            if scratch.of_rle.is_none() {
+                match of_dec.update_state(ref scratch.offsets, ref br) {
+                    Result::Ok(val) => val,
+                    Result::Err(err) => {
+                        break Result::Err(DecodeSequenceError::FSEDecoderError(err));
+                    },
+                };
+            }
         }
 
         if br.bits_remaining() < 0 {
