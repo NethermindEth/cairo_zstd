@@ -43,7 +43,7 @@ async function generateDecodingTestFile(filename) {
 }
 
 async function main() {
-    console.log(`Generating tests for zst files below ${MAX_SIZE_BYTES} bytes...`);
+    console.log(`Generating tests for zst files at or below ${MAX_SIZE_BYTES} bytes...`);
 
     await Promise.all(
         (await readdir(OUTPUT_DIR)).map(filename => unlink(path.join(OUTPUT_DIR, filename)))
