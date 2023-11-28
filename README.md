@@ -6,3 +6,10 @@ project, except that it's now [Cairo](https://github.com/starkware-libs/cairo).
 STARK-provable decompression here we go!
 
 Still a WIP.
+
+### Current development state
+
+- [x] Main implementation porting
+- [x] Decoding tests
+- [ ] Dictionary support
+- [ ] Optimizations and benchmarking
